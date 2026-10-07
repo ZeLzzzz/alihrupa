@@ -7,7 +7,7 @@
 | REQ-001 | Konversi satu gambar PNG/JPG/WEBP ke format lain | done | — |
 | REQ-002 | Output aman dan batch: `-o`, `--force`, banyak file, ringkasan, exit code | done | REQ-001 |
 | REQ-003 | Konversi SVG → PNG | done | REQ-001 |
-| REQ-004 | Konversi PDF → DOCX | ready | REQ-001 |
+| REQ-004 | Konversi PDF → DOCX | done | REQ-001 |
 | REQ-005 | Konversi DOCX → PDF (tanpa LibreOffice) | ready | REQ-001 |
 | REQ-006 | Konversi Markdown/TXT → DOCX | ready | REQ-001 |
 | REQ-007 | Konversi Markdown/TXT → PDF | ready | REQ-001 |
@@ -78,17 +78,17 @@
 
 ## REQ-004 — Konversi PDF → DOCX
 
-**Status:** ready
+**Status:** done
 **Tujuan:** Pengguna bisa mengubah PDF berbasis teks menjadi DOCX yang bisa diedit.
 **Bergantung pada:** REQ-001
 **Keputusan terkait:** D-006, D-013, D-017
 
 ### Acceptance criteria
-- [ ] **AC-1 (alur utama):** Ketika menjalankan `conv laporan.pdf docx` pada PDF berbasis teks, maka `laporan.docx` dibuat dan teksnya bisa diedit di Word/LibreOffice.
-- [ ] **AC-2:** Paragraf, heading, dan gambar sederhana dari PDF muncul di DOCX dengan urutan yang benar. Layout rumit tidak dijamin sama persis (lihat BRIEF, Celah yang diketahui).
-- [ ] **AC-3 (PDF scan):** Ketika PDF tidak punya lapisan teks (hasil scan), maka konversi tetap berjalan, tetapi muncul peringatan bahwa hasilnya berupa gambar dan OCR belum didukung.
-- [ ] **AC-4 (gagal):** Ketika PDF terenkripsi/berpassword, maka muncul pesan yang jelas, dan tidak ada DOCX yang tertinggal.
-- [ ] **AC-5 (gagal):** Ketika PDF rusak, maka muncul pesan gagal yang menyebut nama file, dan exit code 1.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `conv laporan.pdf docx` pada PDF berbasis teks, maka `laporan.docx` dibuat dan teksnya bisa diedit di Word/LibreOffice.
+- [x] **AC-2:** Paragraf, heading, dan gambar sederhana dari PDF muncul di DOCX dengan urutan yang benar. Layout rumit tidak dijamin sama persis (lihat BRIEF, Celah yang diketahui).
+- [x] **AC-3 (PDF scan):** Ketika PDF tidak punya lapisan teks (hasil scan), maka konversi tetap berjalan, tetapi muncul peringatan bahwa hasilnya berupa gambar dan OCR belum didukung.
+- [x] **AC-4 (gagal):** Ketika PDF terenkripsi/berpassword, maka muncul pesan yang jelas, dan tidak ada DOCX yang tertinggal.
+- [x] **AC-5 (gagal):** Ketika PDF rusak, maka muncul pesan gagal yang menyebut nama file, dan exit code 1.
 
 ### Di luar REQ ini
 - OCR (D-013).

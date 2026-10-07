@@ -22,12 +22,12 @@
 | D-016 | Lokasi proyek: `~/Projects/conv/` | Sejajar dengan proyek lain (`local-stt`) | User / 2026-10-07 | — |
 | D-020 | Tidak bergantung pada LibreOffice (atau aplikasi office lain). DOCX → PDF dan Markdown/TXT → PDF memakai mesin ringan yang menyusun ulang isi dokumen; Markdown/TXT → PDF langsung, tidak lewat DOCX | Instalasi cukup `uv tool install` tanpa aplikasi office besar. User menerima bahwa tampilan PDF dari DOCX tidak identik untuk layout rumit | User / 2026-10-07 | BRIEF, REQ-005, REQ-007, REQ-008, G-004; menggantikan D-007 dan D-014 |
 | D-021 | Menyetujui usulan agent: tidak ada file setengah jadi saat gagal (G-005); file sumber tidak pernah diubah (G-003); format sumber = tujuan → pesan, tidak ada aksi; file yang dilewati karena sudah ada dihitung gagal (exit code 1); input teks dibaca UTF-8; sumber URL di SVG/Markdown tidak diunduh | Disetujui user saat gate | User / 2026-10-07 | REQ-001, REQ-002, REQ-003, REQ-006, REQ-007, GUARDRAILS |
+| D-017 | PDF → DOCX memakai pdf2docx; proyek dilisensikan AGPL-3.0 (varian `-or-later` dipilih agent sebagai bawaan, belum dikonfirmasi user) | pdf2docx memberi kualitas PDF → DOCX terbaik secara offline, tapi bergantung pada PyMuPDF (AGPL-3.0). Alternatif MIT (pdfplumber + python-docx) hasilnya jauh lebih kasar | User / 2026-10-07 | REQ-004, REQ-008, `LICENSE`, `pyproject.toml` |
 
 ## Masih terbuka
 
 | ID | Pertanyaan | Opsi (rekomendasi pertama) | Pemilik | Menghambat? |
 |---|---|---|---|---|
-| D-017 | Lisensi proyek. Library PDF → DOCX yang umum (`pdf2docx`, bergantung pada PyMuPDF) berlisensi copyleft (GPL/AGPL), dan ini memengaruhi lisensi tool jika dibagikan | Lisensi menyesuaikan library (GPL/AGPL), atau cari library berlisensi permisif (kualitas mungkin lebih rendah). Lisensi pasti tiap library perlu dicek saat implementasi | User | Tidak untuk coding; menghambat publikasi (REQ-008) |
 | D-018 | Nama paket untuk distribusi jika `conv` sudah dipakai di PyPI | Cek ketersediaan saat REQ-008; alternatif `conv-cli`, `konv` | User | Tidak |
 | D-019 | Mesin ringan untuk dokumen (MD → DOCX, DOCX → PDF, MD/TXT → PDF): mis. pandoc + Typst yang dibundel sebagai paket Python (`pypandoc-binary`, `typst`), atau mammoth + WeasyPrint (butuh library sistem Pango). Ketersediaan dan kualitas belum diverifikasi | Diputuskan saat implementasi REQ-005/REQ-006 setelah dicoba; utamakan yang tidak butuh paket sistem | User + agent | Tidak (scope tetap sama) |
 
