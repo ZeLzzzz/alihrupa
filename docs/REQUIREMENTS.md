@@ -8,9 +8,9 @@
 | REQ-002 | Output aman dan batch: `-o`, `--force`, banyak file, ringkasan, exit code | done | REQ-001 |
 | REQ-003 | Konversi SVG → PNG | done | REQ-001 |
 | REQ-004 | Konversi PDF → DOCX | done | REQ-001 |
-| REQ-005 | Konversi DOCX → PDF (tanpa LibreOffice) | ready | REQ-001 |
-| REQ-006 | Konversi Markdown/TXT → DOCX | ready | REQ-001 |
-| REQ-007 | Konversi Markdown/TXT → PDF | ready | REQ-001 |
+| REQ-005 | Konversi DOCX → PDF (tanpa LibreOffice) | done | REQ-001 |
+| REQ-006 | Konversi Markdown/TXT → DOCX | done | REQ-001 |
+| REQ-007 | Konversi Markdown/TXT → PDF | done | REQ-001 |
 | REQ-008 | Instalasi dan README untuk pengguna lain | ready | REQ-001 |
 
 ---
@@ -98,17 +98,17 @@
 
 ## REQ-005 — Konversi DOCX → PDF
 
-**Status:** ready
+**Status:** done
 **Tujuan:** Pengguna bisa mengubah DOCX menjadi PDF tanpa memasang aplikasi office.
 **Bergantung pada:** REQ-001
 **Keputusan terkait:** D-006, D-019, D-020
 
 ### Acceptance criteria
-- [ ] **AC-1 (alur utama):** Ketika menjalankan `conv surat.docx pdf`, maka `surat.pdf` dibuat, berisi semua teks, heading, list, tabel sederhana, dan gambar dari DOCX dengan urutan yang benar.
-- [ ] **AC-2:** Format teks dasar (tebal, miring, ukuran heading) dipertahankan. Tampilan tidak harus identik dengan Word (D-020).
-- [ ] **AC-3:** Konversi berhasil di mesin tanpa LibreOffice/Word (G-004).
-- [ ] **AC-4 (batasan):** Ketika DOCX berisi elemen yang tidak bisa disusun ulang (mis. text box, kolom, header/footer), maka konversi tetap selesai dan isi teksnya tidak hilang diam-diam. Jika elemen dilewati, muncul peringatan.
-- [ ] **AC-5 (gagal):** Ketika DOCX rusak atau bukan DOCX valid, maka muncul pesan gagal yang menyebut nama file, tidak ada PDF yang tertinggal, dan exit code 1.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `conv surat.docx pdf`, maka `surat.pdf` dibuat, berisi semua teks, heading, list, tabel sederhana, dan gambar dari DOCX dengan urutan yang benar.
+- [x] **AC-2:** Format teks dasar (tebal, miring, ukuran heading) dipertahankan. Tampilan tidak harus identik dengan Word (D-020).
+- [x] **AC-3:** Konversi berhasil di mesin tanpa LibreOffice/Word (G-004).
+- [x] **AC-4 (batasan):** Ketika DOCX berisi elemen yang tidak bisa disusun ulang (mis. text box, kolom, header/footer), maka konversi tetap selesai dan isi teksnya tidak hilang diam-diam. Jika elemen dilewati, muncul peringatan.
+- [x] **AC-5 (gagal):** Ketika DOCX rusak atau bukan DOCX valid, maka muncul pesan gagal yang menyebut nama file, tidak ada PDF yang tertinggal, dan exit code 1.
 
 ### Di luar REQ ini
 - Tampilan identik halaman per halaman dengan Word (D-020).
@@ -118,18 +118,18 @@
 
 ## REQ-006 — Konversi Markdown/TXT → DOCX
 
-**Status:** ready
+**Status:** done
 **Tujuan:** Pengguna bisa mengubah catatan Markdown atau teks biasa menjadi DOCX.
 **Bergantung pada:** REQ-001
 **Keputusan terkait:** D-006, D-019
 
 ### Acceptance criteria
-- [ ] **AC-1 (alur utama):** Ketika menjalankan `conv catatan.md docx`, maka `catatan.docx` dibuat, dan heading, paragraf, daftar (bullet/bernomor), teks tebal/miring, serta blok kode tampil dengan format yang sesuai.
-- [ ] **AC-2:** Ketika menjalankan `conv catatan.txt docx`, maka setiap paragraf teks menjadi paragraf DOCX tanpa interpretasi Markdown.
-- [ ] **AC-3:** Teks non-ASCII (mis. huruf beraksen, emoji) tampil benar. File input dibaca sebagai UTF-8.
-- [ ] **AC-4 (input tidak valid):** Ketika file bukan UTF-8 yang valid, maka muncul pesan gagal yang jelas, dan tidak ada DOCX yang tertinggal.
-- [ ] **AC-5 (kosong):** Ketika file kosong, maka DOCX kosong tetap dibuat dan konversi tidak crash.
-- [ ] **AC-6:** Gambar di Markdown yang merujuk URL tidak diunduh (G-001); gambar lokal dengan path relatif disertakan jika ada.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `conv catatan.md docx`, maka `catatan.docx` dibuat, dan heading, paragraf, daftar (bullet/bernomor), teks tebal/miring, serta blok kode tampil dengan format yang sesuai.
+- [x] **AC-2:** Ketika menjalankan `conv catatan.txt docx`, maka setiap paragraf teks menjadi paragraf DOCX tanpa interpretasi Markdown.
+- [x] **AC-3:** Teks non-ASCII (mis. huruf beraksen, emoji) tampil benar. File input dibaca sebagai UTF-8.
+- [x] **AC-4 (input tidak valid):** Ketika file bukan UTF-8 yang valid, maka muncul pesan gagal yang jelas, dan tidak ada DOCX yang tertinggal.
+- [x] **AC-5 (kosong):** Ketika file kosong, maka DOCX kosong tetap dibuat dan konversi tidak crash.
+- [x] **AC-6:** Gambar di Markdown yang merujuk URL tidak diunduh (G-001); gambar lokal dengan path relatif disertakan jika ada.
 
 ### Di luar REQ ini
 - Tabel Markdown kompleks dan ekstensi seperti matematika atau diagram.
@@ -138,16 +138,16 @@
 
 ## REQ-007 — Konversi Markdown/TXT → PDF
 
-**Status:** ready
+**Status:** done
 **Tujuan:** Pengguna bisa mengubah Markdown/TXT langsung ke PDF dengan satu perintah.
 **Bergantung pada:** REQ-001
 **Keputusan terkait:** D-019, D-020
 
 ### Acceptance criteria
-- [ ] **AC-1 (alur utama):** Ketika menjalankan `conv catatan.md pdf`, maka `catatan.pdf` dibuat, dan heading, paragraf, list, teks tebal/miring, serta blok kode tampil dengan format yang sesuai.
-- [ ] **AC-2:** Konversi langsung dari Markdown/TXT, tanpa file DOCX perantara di folder pengguna (D-020).
-- [ ] **AC-3:** Teks non-ASCII tampil benar. Aturan UTF-8, file kosong, dan gambar URL sama dengan REQ-006 AC-3 s.d. AC-6.
-- [ ] **AC-4 (gagal):** Ketika konversi gagal, maka tidak ada PDF setengah jadi yang tertinggal, dan exit code 1.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `conv catatan.md pdf`, maka `catatan.pdf` dibuat, dan heading, paragraf, list, teks tebal/miring, serta blok kode tampil dengan format yang sesuai.
+- [x] **AC-2:** Konversi langsung dari Markdown/TXT, tanpa file DOCX perantara di folder pengguna (D-020).
+- [x] **AC-3:** Teks non-ASCII tampil benar. Aturan UTF-8, file kosong, dan gambar URL sama dengan REQ-006 AC-3 s.d. AC-6.
+- [x] **AC-4 (gagal):** Ketika konversi gagal, maka tidak ada PDF setengah jadi yang tertinggal, dan exit code 1.
 
 ### Di luar REQ ini
 - Tema/CSS khusus untuk PDF.

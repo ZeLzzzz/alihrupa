@@ -1,8 +1,5 @@
 """REQ-003: SVG → PNG."""
 
-import http.server
-import threading
-
 import pytest
 from PIL import Image
 
@@ -33,29 +30,14 @@ def test_invalid_svg(tmp_path, capsys, content):
     assert sorted(p.name for p in tmp_path.iterdir()) == ["rusak.svg"]
 
 
-def test_remote_images_are_not_downloaded(tmp_path):
-    requests = []
-
-    class Handler(http.server.BaseHTTPRequestHandler):
-        def do_GET(self):
-            requests.append(self.path)
-            self.send_error(404)
-
-        def log_message(self, *args):
-            pass
-
-    server = http.server.HTTPServer(("127.0.0.1", 0), Handler)
-    threading.Thread(target=server.serve_forever, daemon=True).start()
-    url = f"http://127.0.0.1:{server.server_port}/x.png"
+def test_remote_images_are_not_downloaded(tmp_path, http_server):
+    base, requests = http_server
     source = tmp_path / "remote.svg"
     source.write_text(
         f'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">'
-        f'<rect width="10" height="10" fill="blue"/><image href="{url}" width="5" height="5"/></svg>'
+        f'<rect width="10" height="10" fill="blue"/><image href="{base}/x.png" width="5" height="5"/></svg>'
     )
-    try:
-        assert main([str(source), "png"]) == 0  # G-001: renders without the remote image
-    finally:
-        server.shutdown()
+    assert main([str(source), "png"]) == 0  # G-001: renders without the remote image
     assert requests == []
 
 

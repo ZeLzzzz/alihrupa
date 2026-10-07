@@ -9,6 +9,9 @@ dependencies = [
     "pdf2docx>=0.5.13",
     # 11+ for Image.has_transparency_data and current WEBP handling.
     "pillow>=11",
+    # Bundled pandoc + Typst: documents without an office suite or system packages (D-019, D-020).
+    "pypandoc-binary>=1.17",
+    "typst>=0.15.0",
     # Bundled resvg renderer: no system cairo needed, and it never loads remote URLs (G-001).
     "resvg-py>=0.5",
 ]
