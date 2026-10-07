@@ -29,7 +29,7 @@
 
 | ID | Pertanyaan | Opsi (rekomendasi pertama) | Pemilik | Menghambat? |
 |---|---|---|---|---|
-| D-018 | Nama paket untuk distribusi jika `conv` sudah dipakai di PyPI | Cek ketersediaan saat REQ-008; alternatif `conv-cli`, `konv` | User | Tidak |
+| D-018 | Nama paket jika nanti dipublikasikan ke PyPI. Dicek 2026-10-07: `conv` sudah dipakai di PyPI; `conv-cli` dan `konv` masih kosong | Untuk sekarang instalasi lewat git (`uv tool install git+…`), tidak perlu PyPI; jika publish: `conv-cli` (perintah tetap `conv`), atau `konv` | User | Tidak (publikasi PyPI di luar REQ-008) |
 
 ## Perubahan scope
 

@@ -2,6 +2,7 @@
 name = "conv"
 version = "0.1.0"
 description = "Convert files between formats locally. Files never leave your machine."
+readme = "README.md"
 license = "AGPL-3.0-or-later"
 requires-python = ">=3.10"
 dependencies = [

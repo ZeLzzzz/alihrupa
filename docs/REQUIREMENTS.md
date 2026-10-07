@@ -11,7 +11,7 @@
 | REQ-005 | Konversi DOCX → PDF (tanpa LibreOffice) | done | REQ-001 |
 | REQ-006 | Konversi Markdown/TXT → DOCX | done | REQ-001 |
 | REQ-007 | Konversi Markdown/TXT → PDF | done | REQ-001 |
-| REQ-008 | Instalasi dan README untuk pengguna lain | ready | REQ-001 |
+| REQ-008 | Instalasi dan README untuk pengguna lain | done | REQ-001 |
 
 ---
 
@@ -156,17 +156,17 @@
 
 ## REQ-008 — Instalasi dan README untuk pengguna lain
 
-**Status:** ready
+**Status:** done
 **Tujuan:** Orang lain di Linux bisa memasang dan memakai `conv` tanpa bertanya ke pemilik proyek.
 **Bergantung pada:** REQ-001
 **Keputusan terkait:** D-001, D-002, D-015, D-017, D-018, D-020
 
 ### Acceptance criteria
-- [ ] **AC-1 (alur utama):** Di mesin Linux yang bersih dengan `uv`, `uv tool install <sumber>` memasang perintah `conv`, dan `conv --help` berjalan.
-- [ ] **AC-2:** README menjelaskan cara instalasi, contoh perintah, tabel konversi yang didukung, dan dependensi sistem jika ada (tergantung D-019), termasuk contoh perintah instalasinya untuk Arch dan Debian/Ubuntu.
-- [ ] **AC-3:** README menyebut batasan yang diketahui (kualitas PDF → DOCX, DOCX → PDF tidak identik dengan Word, tidak ada OCR, hanya Linux).
-- [ ] **AC-4:** Di mesin tanpa LibreOffice/Word, semua konversi v1 berfungsi setelah instalasi sesuai README.
-- [ ] **AC-5:** Repo memiliki file lisensi sesuai D-017 sebelum dipublikasikan.
+- [x] **AC-1 (alur utama):** Di mesin Linux yang bersih dengan `uv`, `uv tool install <sumber>` memasang perintah `conv`, dan `conv --help` berjalan.
+- [x] **AC-2:** README menjelaskan cara instalasi, contoh perintah, tabel konversi yang didukung, dan dependensi sistem jika ada (tergantung D-019), termasuk contoh perintah instalasinya untuk Arch dan Debian/Ubuntu.
+- [x] **AC-3:** README menyebut batasan yang diketahui (kualitas PDF → DOCX, DOCX → PDF tidak identik dengan Word, tidak ada OCR, hanya Linux).
+- [x] **AC-4:** Di mesin tanpa LibreOffice/Word, semua konversi v1 berfungsi setelah instalasi sesuai README.
+- [x] **AC-5:** Repo memiliki file lisensi sesuai D-017 sebelum dipublikasikan.
 
 ### Di luar REQ ini
 - Paket AUR/PyPI otomatis dan dukungan Windows/macOS.
