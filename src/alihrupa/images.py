@@ -4,7 +4,7 @@ from pathlib import Path
 
 from PIL import Image, ImageOps, UnidentifiedImageError
 
-from conv.errors import ConvertError
+from alihrupa.errors import ConvertError
 
 RASTER = ("png", "jpg", "webp")
 

@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from pathlib import Path
 
-from conv import documents, images, pdf, svg
+from alihrupa import documents, images, pdf, svg
 
 Converter = Callable[[Path, Path, str], None]
 

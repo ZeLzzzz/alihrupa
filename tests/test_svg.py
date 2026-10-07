@@ -3,7 +3,7 @@
 import pytest
 from PIL import Image
 
-from conv.cli import main
+from alihrupa.cli import main
 
 LOGO = """<svg xmlns="http://www.w3.org/2000/svg" width="40" height="30">
   <rect width="20" height="30" fill="red"/>

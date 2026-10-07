@@ -6,9 +6,9 @@ import sys
 import tempfile
 from pathlib import Path
 
-from conv import __version__
-from conv.converters import CONVERTERS, normalize, supported_table
-from conv.errors import ConvertError
+from alihrupa import __version__
+from alihrupa.converters import CONVERTERS, normalize, supported_table
+from alihrupa.errors import ConvertError
 
 EXISTS = "{dst} sudah ada, tidak ditimpa (pakai --force untuk menimpa)"
 
@@ -41,14 +41,14 @@ def convert_file(src: Path, target: str, target_ext: str, out_dir: Path | None, 
         raise ConvertError(f"file sudah dalam format {target}, tidak ada yang diubah")
     converter = CONVERTERS.get((source, target))
     if converter is None:
-        raise ConvertError(f"konversi {source} → {target} tidak didukung (lihat conv --help)")
+        raise ConvertError(f"konversi {source} → {target} tidak didukung (lihat alihrupa --help)")
 
     dst = (out_dir or src.parent) / f"{src.stem}.{target_ext}"
     if dst.exists() and not force:
         raise ConvertError(EXISTS.format(dst=dst))
     # Write next to the destination first, so a failed conversion never leaves a half-written result.
     try:
-        fd, name = tempfile.mkstemp(dir=dst.parent, prefix=f".{dst.stem}.", suffix=".conv-tmp")
+        fd, name = tempfile.mkstemp(dir=dst.parent, prefix=f".{dst.stem}.", suffix=".alihrupa-tmp")
     except OSError as e:
         raise ConvertError(f"tidak bisa menulis ke {dst.parent} ({e})") from None
     os.close(fd)
@@ -65,16 +65,16 @@ def convert_file(src: Path, target: str, target_ext: str, out_dir: Path | None, 
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
-        prog="conv",
+        prog="alihrupa",
         description="Konversi file antarformat secara lokal. File tidak pernah keluar dari komputer ini.",
-        epilog=f"contoh:\n  conv foto.png jpg\n  conv *.webp png -o hasil/\n\nkonversi yang didukung:\n{supported_table()}",
+        epilog=f"contoh:\n  alihrupa foto.png jpg\n  alihrupa *.webp png -o hasil/\n\nkonversi yang didukung:\n{supported_table()}",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("files", nargs="+", type=Path, help="file yang akan dikonversi")
     p.add_argument("format", help="format tujuan, mis. jpg, png, webp")
     p.add_argument("-o", "--output", type=Path, help="folder hasil (bawaan: folder yang sama dengan file asli)")
     p.add_argument("-f", "--force", action="store_true", help="timpa file hasil yang sudah ada")
-    p.add_argument("-V", "--version", action="version", version=f"conv {__version__}")
+    p.add_argument("-V", "--version", action="version", version=f"alihrupa {__version__}")
     args = p.parse_args(argv)
 
     target_ext = args.format.lower().lstrip(".")
@@ -83,7 +83,7 @@ def main(argv: list[str] | None = None) -> int:
         try:
             args.output.mkdir(parents=True, exist_ok=True)
         except OSError as e:
-            print(f"conv: tidak bisa membuat folder {args.output} ({e})", file=sys.stderr)
+            print(f"alihrupa: tidak bisa membuat folder {args.output} ({e})", file=sys.stderr)
             return 1
 
     failed: list[tuple[Path, str]] = []
@@ -92,7 +92,7 @@ def main(argv: list[str] | None = None) -> int:
             dst = convert_file(src, target, target_ext, args.output, args.force)
         except ConvertError as e:
             failed.append((src, str(e)))
-            print(f"conv: {src}: {e}", file=sys.stderr)
+            print(f"alihrupa: {src}: {e}", file=sys.stderr)
             continue
         print(f"{src} → {dst}")
 

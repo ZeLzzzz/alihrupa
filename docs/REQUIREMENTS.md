@@ -23,13 +23,13 @@
 **Keputusan terkait:** D-004, D-009, D-010, D-022, D-023
 
 ### Acceptance criteria
-- [x] **AC-1 (alur utama):** Ketika menjalankan `conv foto.png jpg`, maka `foto.jpg` dibuat di folder yang sama dan path hasilnya dicetak di terminal; exit code 0.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa foto.png jpg`, maka `foto.jpg` dibuat di folder yang sama dan path hasilnya dicetak di terminal; exit code 0.
 - [x] **AC-2:** Semua pasangan antar PNG, JPG, dan WEBP berhasil. Format tujuan menerima `jpg` dan `jpeg`, tanpa membedakan huruf besar/kecil.
 - [x] **AC-3:** Ketika PNG atau WEBP transparan dikonversi ke JPG, maka area transparan menjadi putih (bukan hitam).
-- [x] **AC-4 (input tidak valid):** Ketika pasangan format tidak didukung (mis. `conv foto.png mp3`), maka muncul pesan yang menyebut pasangan tersebut tidak didukung, tidak ada file dibuat, dan exit code 1.
+- [x] **AC-4 (input tidak valid):** Ketika pasangan format tidak didukung (mis. `alihrupa foto.png mp3`), maka muncul pesan yang menyebut pasangan tersebut tidak didukung, tidak ada file dibuat, dan exit code 1.
 - [x] **AC-5 (gagal):** Ketika file tidak ditemukan atau isinya bukan gambar valid (rusak/berekstensi salah), maka muncul pesan yang menyebut nama file dan alasannya, tidak ada file hasil yang tertinggal, dan exit code 1.
-- [x] **AC-6:** Ketika format sumber sama dengan tujuan (mis. `conv a.png png`), maka muncul pesan bahwa file sudah dalam format itu, file tidak diubah, dan exit code 1 (D-022).
-- [x] **AC-7:** `conv --help` menampilkan cara pakai dan daftar format yang didukung.
+- [x] **AC-6:** Ketika format sumber sama dengan tujuan (mis. `alihrupa a.png png`), maka muncul pesan bahwa file sudah dalam format itu, file tidak diubah, dan exit code 1 (D-022).
+- [x] **AC-7:** `alihrupa --help` menampilkan cara pakai dan daftar format yang didukung.
 
 ### Di luar REQ ini
 - Opsi kualitas dan resize (D-010).
@@ -45,7 +45,7 @@
 **Keputusan terkait:** D-008, D-011
 
 ### Acceptance criteria
-- [x] **AC-1 (alur utama):** Ketika menjalankan `conv a.png b.png c.png jpg` (atau `conv *.png jpg`), maka ketiga file dikonversi dan ringkasan di akhir menampilkan jumlah berhasil dan gagal.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa a.png b.png c.png jpg` (atau `alihrupa *.png jpg`), maka ketiga file dikonversi dan ringkasan di akhir menampilkan jumlah berhasil dan gagal.
 - [x] **AC-2:** Ketika `-o hasil/` diberikan, maka semua hasil disimpan di `hasil/`. Jika folder belum ada, folder dibuat.
 - [x] **AC-3 (tidak menimpa):** Ketika file tujuan sudah ada, maka file itu dilewati dengan pesan yang menyarankan `--force`; isi file lama tidak berubah; file itu dihitung gagal di ringkasan.
 - [x] **AC-4:** Ketika `--force` diberikan, maka file tujuan yang sudah ada ditimpa.
@@ -66,7 +66,7 @@
 **Keputusan terkait:** D-009
 
 ### Acceptance criteria
-- [x] **AC-1 (alur utama):** Ketika menjalankan `conv logo.svg png`, maka `logo.png` dibuat sesuai ukuran yang didefinisikan di SVG, dan latar transparan tetap transparan.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa logo.svg png`, maka `logo.png` dibuat sesuai ukuran yang didefinisikan di SVG, dan latar transparan tetap transparan.
 - [x] **AC-2 (input tidak valid):** Ketika SVG tidak valid, maka muncul pesan gagal yang menyebut nama file, dan tidak ada PNG yang tertinggal.
 - [x] **AC-3:** Ketika SVG mereferensikan sumber eksternal via URL, maka sumber itu tidak diunduh (G-001); konversi tetap berjalan tanpa sumber tersebut.
 - [x] **AC-4:** Ketika diminta SVG → JPG/WEBP atau raster → SVG, maka muncul pesan tidak didukung.
@@ -84,7 +84,7 @@
 **Keputusan terkait:** D-006, D-013, D-017
 
 ### Acceptance criteria
-- [x] **AC-1 (alur utama):** Ketika menjalankan `conv laporan.pdf docx` pada PDF berbasis teks, maka `laporan.docx` dibuat dan teksnya bisa diedit di Word/LibreOffice.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa laporan.pdf docx` pada PDF berbasis teks, maka `laporan.docx` dibuat dan teksnya bisa diedit di Word/LibreOffice.
 - [x] **AC-2:** Paragraf, heading, dan gambar sederhana dari PDF muncul di DOCX dengan urutan yang benar. Layout rumit tidak dijamin sama persis (lihat BRIEF, Celah yang diketahui).
 - [x] **AC-3 (PDF scan):** Ketika PDF tidak punya lapisan teks (hasil scan), maka konversi tetap berjalan, tetapi muncul peringatan bahwa hasilnya berupa gambar dan OCR belum didukung.
 - [x] **AC-4 (gagal):** Ketika PDF terenkripsi/berpassword, maka muncul pesan yang jelas, dan tidak ada DOCX yang tertinggal.
@@ -104,7 +104,7 @@
 **Keputusan terkait:** D-006, D-019, D-020
 
 ### Acceptance criteria
-- [x] **AC-1 (alur utama):** Ketika menjalankan `conv surat.docx pdf`, maka `surat.pdf` dibuat, berisi semua teks, heading, list, tabel sederhana, dan gambar dari DOCX dengan urutan yang benar.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa surat.docx pdf`, maka `surat.pdf` dibuat, berisi semua teks, heading, list, tabel sederhana, dan gambar dari DOCX dengan urutan yang benar.
 - [x] **AC-2:** Format teks dasar (tebal, miring, ukuran heading) dipertahankan. Tampilan tidak harus identik dengan Word (D-020).
 - [x] **AC-3:** Konversi berhasil di mesin tanpa LibreOffice/Word (G-004).
 - [x] **AC-4 (batasan):** Ketika DOCX berisi elemen yang tidak bisa disusun ulang (mis. text box, kolom, header/footer), maka konversi tetap selesai dan isi teksnya tidak hilang diam-diam. Jika elemen dilewati, muncul peringatan.
@@ -124,8 +124,8 @@
 **Keputusan terkait:** D-006, D-019, D-024
 
 ### Acceptance criteria
-- [x] **AC-1 (alur utama):** Ketika menjalankan `conv catatan.md docx`, maka `catatan.docx` dibuat, dan heading, paragraf, daftar (bullet/bernomor), teks tebal/miring, serta blok kode tampil dengan format yang sesuai.
-- [x] **AC-2:** Ketika menjalankan `conv catatan.txt docx`, maka setiap paragraf teks menjadi paragraf DOCX tanpa interpretasi Markdown.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa catatan.md docx`, maka `catatan.docx` dibuat, dan heading, paragraf, daftar (bullet/bernomor), teks tebal/miring, serta blok kode tampil dengan format yang sesuai.
+- [x] **AC-2:** Ketika menjalankan `alihrupa catatan.txt docx`, maka setiap paragraf teks menjadi paragraf DOCX tanpa interpretasi Markdown.
 - [x] **AC-3:** Teks non-ASCII (mis. huruf beraksen, emoji) tampil benar. File input dibaca sebagai UTF-8.
 - [x] **AC-4 (input tidak valid):** Ketika file bukan UTF-8 yang valid, maka muncul pesan gagal yang jelas, dan tidak ada DOCX yang tertinggal.
 - [x] **AC-5 (kosong):** Ketika file kosong, maka DOCX kosong tetap dibuat dan konversi tidak crash.
@@ -144,7 +144,7 @@
 **Keputusan terkait:** D-019, D-020, D-024
 
 ### Acceptance criteria
-- [x] **AC-1 (alur utama):** Ketika menjalankan `conv catatan.md pdf`, maka `catatan.pdf` dibuat, dan heading, paragraf, list, teks tebal/miring, serta blok kode tampil dengan format yang sesuai.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa catatan.md pdf`, maka `catatan.pdf` dibuat, dan heading, paragraf, list, teks tebal/miring, serta blok kode tampil dengan format yang sesuai.
 - [x] **AC-2:** Konversi langsung dari Markdown/TXT, tanpa file DOCX perantara di folder pengguna (D-020).
 - [x] **AC-3:** Teks non-ASCII tampil benar. Aturan UTF-8, file kosong, dan gambar URL sama dengan REQ-006 AC-3 s.d. AC-6.
 - [x] **AC-4 (gagal):** Ketika konversi gagal, maka tidak ada PDF setengah jadi yang tertinggal, dan exit code 1.
@@ -157,12 +157,12 @@
 ## REQ-008 — Instalasi dan README untuk pengguna lain
 
 **Status:** done
-**Tujuan:** Orang lain di Linux bisa memasang dan memakai `conv` tanpa bertanya ke pemilik proyek.
+**Tujuan:** Orang lain di Linux bisa memasang dan memakai `alihrupa` tanpa bertanya ke pemilik proyek.
 **Bergantung pada:** REQ-001
 **Keputusan terkait:** D-001, D-002, D-015, D-017, D-018, D-020
 
 ### Acceptance criteria
-- [x] **AC-1 (alur utama):** Di mesin Linux yang bersih dengan `uv`, `uv tool install <sumber>` memasang perintah `conv`, dan `conv --help` berjalan.
+- [x] **AC-1 (alur utama):** Di mesin Linux yang bersih dengan `uv`, `uv tool install <sumber>` memasang perintah `alihrupa`, dan `alihrupa --help` berjalan.
 - [x] **AC-2:** README menjelaskan cara instalasi, contoh perintah, tabel konversi yang didukung, dan dependensi sistem jika ada (tergantung D-019), termasuk contoh perintah instalasinya untuk Arch dan Debian/Ubuntu.
 - [x] **AC-3:** README menyebut batasan yang diketahui (kualitas PDF → DOCX, DOCX → PDF tidak identik dengan Word, tidak ada OCR, hanya Linux).
 - [x] **AC-4:** Di mesin tanpa LibreOffice/Word, semua konversi v1 berfungsi setelah instalasi sesuai README.

@@ -7,10 +7,10 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-from conv.errors import ConvertError, warn
+from alihrupa.errors import ConvertError, warn
 
 NO_REMOTE = Path(__file__).with_name("no_remote.lua")
-REMOTE_MARKER = "conv-remote-image\t"
+REMOTE_MARKER = "alihrupa-remote-image\t"
 
 
 def read_text(src: Path) -> str:
@@ -84,7 +84,7 @@ def to_pdf(src: Path, dst: Path, fmt: str) -> None:
     import typst
 
     lost = lost_docx_parts(src) if src.suffix.lower() == ".docx" else []
-    with tempfile.TemporaryDirectory(prefix="conv-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="alihrupa-") as tmp:
         work = Path(tmp)
         # Relative media paths, so Typst can resolve them inside its root folder.
         pandoc(src, ["-t", "typst", "--standalone", "-V", "papersize=a4", "--extract-media=media", "-o", "doc.typ"], cwd=work)

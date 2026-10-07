@@ -1,16 +1,16 @@
-# conv — Brief
+# alihrupa — Brief
 
 ## Masalah
-Mengonversi file antarformat (PDF ↔ DOCX, PNG ↔ JPG, dan lainnya) biasanya dilakukan lewat situs online. Cara itu lambat untuk banyak file, dan file pribadi ikut terunggah ke server orang lain. `conv` adalah tool terminal yang melakukan konversi ini secara lokal dan offline dengan satu perintah.
+Mengonversi file antarformat (PDF ↔ DOCX, PNG ↔ JPG, dan lainnya) biasanya dilakukan lewat situs online. Cara itu lambat untuk banyak file, dan file pribadi ikut terunggah ke server orang lain. `alihrupa` adalah tool terminal yang melakukan konversi ini secara lokal dan offline dengan satu perintah.
 
 ## Pengguna
 - **Pemilik proyek (pengguna Linux/terminal):** ingin mengonversi satu atau banyak file dengan cepat tanpa membuka aplikasi atau situs.
 - **Pengguna lain (tool dibagikan):** ingin memasang tool dengan mudah dan tahu dependensi apa yang dibutuhkan untuk tiap jenis konversi.
 
 ## Alur utama
-1. Konversi satu file: `conv laporan.pdf docx` → file `laporan.docx` muncul di samping file asli → terminal menampilkan path hasil.
-2. Konversi banyak file: `conv *.png jpg` → semua file dikonversi → ringkasan berhasil/gagal di akhir.
-3. Konversi ke folder lain: `conv foto.webp png -o hasil/` → hasil disimpan di `hasil/`.
+1. Konversi satu file: `alihrupa laporan.pdf docx` → file `laporan.docx` muncul di samping file asli → terminal menampilkan path hasil.
+2. Konversi banyak file: `alihrupa *.png jpg` → semua file dikonversi → ringkasan berhasil/gagal di akhir.
+3. Konversi ke folder lain: `alihrupa foto.webp png -o hasil/` → hasil disimpan di `hasil/`.
 
 ## Dalam scope
 - Gambar: PNG ↔ JPG ↔ WEBP dan SVG → PNG. Hanya ganti format.

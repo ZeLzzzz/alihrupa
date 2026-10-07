@@ -2,7 +2,7 @@
 
 from PIL import Image
 
-from conv.cli import main
+from alihrupa.cli import main
 
 
 def make_png(path):

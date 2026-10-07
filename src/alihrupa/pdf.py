@@ -4,7 +4,7 @@ import io
 import logging
 from pathlib import Path
 
-from conv.errors import ConvertError, warn
+from alihrupa.errors import ConvertError, warn
 
 
 class _ErrorCollector(logging.Handler):

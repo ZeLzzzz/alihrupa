@@ -6,4 +6,4 @@ def warn(src, message: str) -> None:
     """A conversion succeeded, but the user should know about a limitation of the result."""
     import sys
 
-    print(f"conv: {src}: peringatan: {message}", file=sys.stderr)
+    print(f"alihrupa: {src}: peringatan: {message}", file=sys.stderr)

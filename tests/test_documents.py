@@ -9,7 +9,7 @@ import pytest
 from docx.oxml import parse_xml
 from PIL import Image
 
-from conv.cli import main
+from alihrupa.cli import main
 
 NOTE = """# Judul Catatan
 

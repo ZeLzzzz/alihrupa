@@ -1,11 +1,11 @@
--- conv never downloads anything (G-001): replace images referenced by URL with their
--- description, and report each one on stderr so conv can warn about it.
+-- alihrupa never downloads anything (G-001): replace images referenced by URL with their
+-- description, and report each one on stderr so alihrupa can warn about it.
 local function is_remote(src)
   return src:match("^%a[%w+.-]*:") ~= nil and src:match("^file:") == nil
 end
 
 local function report(src)
-  io.stderr:write("conv-remote-image\t" .. src .. "\n")
+  io.stderr:write("alihrupa-remote-image\t" .. src .. "\n")
 end
 
 local figures = {

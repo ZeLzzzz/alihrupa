@@ -6,7 +6,7 @@ import pytest
 
 @pytest.fixture
 def http_server():
-    """A local server that records every request, to prove conv never downloads anything (G-001)."""
+    """A local server that records every request, to prove alihrupa never downloads anything (G-001)."""
     requests = []
 
     class Handler(http.server.BaseHTTPRequestHandler):

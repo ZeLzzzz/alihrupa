@@ -7,7 +7,7 @@ import pymupdf
 import pytest
 from PIL import Image
 
-from conv.cli import main
+from alihrupa.cli import main
 
 
 def png_bytes(color="gray", size=(200, 100)):

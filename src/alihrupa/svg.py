@@ -5,7 +5,7 @@ from pathlib import Path
 
 import resvg_py
 
-from conv.errors import ConvertError, warn
+from alihrupa.errors import ConvertError, warn
 
 # href="https://…" or url(https://…) with any scheme except inline data: and local file:.
 REMOTE_REF = re.compile(r"""(?:href\s*=\s*["']|url\(\s*["']?)\s*(?!data:|file:)[a-zA-Z][\w+.-]*:""")
