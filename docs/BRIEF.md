@@ -26,6 +26,7 @@ Mengonversi file antarformat (PDF ↔ DOCX, PNG ↔ JPG, dan lainnya) biasanya d
 - OCR untuk PDF hasil scan (ditunda).
 - Edit PDF: merge, split, kompres (ditunda).
 - Opsi gambar selain ganti format (kualitas, resize).
+- Opsi ukuran kertas PDF; v1 selalu A4 (fitur mendatang, D-025).
 - Dukungan resmi Windows/macOS (nice-to-have, bukan v1).
 - Layanan atau API online apa pun.
 - Ketergantungan pada LibreOffice, Microsoft Word, atau aplikasi office lain (D-020).
