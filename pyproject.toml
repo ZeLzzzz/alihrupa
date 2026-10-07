@@ -1,0 +1,19 @@
+[project]
+name = "conv"
+version = "0.1.0"
+description = "Convert files between formats locally. Files never leave your machine."
+requires-python = ">=3.10"
+dependencies = [
+    # 11+ for Image.has_transparency_data and current WEBP handling.
+    "pillow>=11",
+]
+
+[project.scripts]
+conv = "conv.cli:run"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
