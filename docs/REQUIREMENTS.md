@@ -5,7 +5,7 @@
 | ID | Hasil yang terlihat pengguna | Status | Bergantung pada |
 |---|---|---|---|
 | REQ-001 | Konversi satu gambar PNG/JPG/WEBP ke format lain | done | — |
-| REQ-002 | Output aman dan batch: `-o`, `--force`, banyak file, ringkasan, exit code | ready | REQ-001 |
+| REQ-002 | Output aman dan batch: `-o`, `--force`, banyak file, ringkasan, exit code | done | REQ-001 |
 | REQ-003 | Konversi SVG → PNG | ready | REQ-001 |
 | REQ-004 | Konversi PDF → DOCX | ready | REQ-001 |
 | REQ-005 | Konversi DOCX → PDF (tanpa LibreOffice) | ready | REQ-001 |
@@ -39,19 +39,19 @@
 
 ## REQ-002 — Output aman dan batch
 
-**Status:** ready
+**Status:** done
 **Tujuan:** Pengguna bisa mengonversi banyak file sekaligus dan memilih lokasi hasil tanpa risiko menimpa file, sehingga batch besar aman dijalankan.
 **Bergantung pada:** REQ-001
 **Keputusan terkait:** D-008, D-011
 
 ### Acceptance criteria
-- [ ] **AC-1 (alur utama):** Ketika menjalankan `conv a.png b.png c.png jpg` (atau `conv *.png jpg`), maka ketiga file dikonversi dan ringkasan di akhir menampilkan jumlah berhasil dan gagal.
-- [ ] **AC-2:** Ketika `-o hasil/` diberikan, maka semua hasil disimpan di `hasil/`. Jika folder belum ada, folder dibuat.
-- [ ] **AC-3 (tidak menimpa):** Ketika file tujuan sudah ada, maka file itu dilewati dengan pesan yang menyarankan `--force`; isi file lama tidak berubah; file itu dihitung gagal di ringkasan.
-- [ ] **AC-4:** Ketika `--force` diberikan, maka file tujuan yang sudah ada ditimpa.
-- [ ] **AC-5 (sebagian gagal):** Ketika satu file di tengah batch rusak, maka file lain tetap dikonversi, ringkasan mencantumkan file yang gagal beserta alasannya, dan exit code 1.
-- [ ] **AC-6:** Ketika semua file berhasil, maka exit code 0.
-- [ ] **AC-7:** Ketika dua file sumber menghasilkan nama tujuan yang sama (mis. `a.png` dan `a.webp` → `jpg`), maka yang kedua tidak menimpa yang pertama tanpa `--force`.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `conv a.png b.png c.png jpg` (atau `conv *.png jpg`), maka ketiga file dikonversi dan ringkasan di akhir menampilkan jumlah berhasil dan gagal.
+- [x] **AC-2:** Ketika `-o hasil/` diberikan, maka semua hasil disimpan di `hasil/`. Jika folder belum ada, folder dibuat.
+- [x] **AC-3 (tidak menimpa):** Ketika file tujuan sudah ada, maka file itu dilewati dengan pesan yang menyarankan `--force`; isi file lama tidak berubah; file itu dihitung gagal di ringkasan.
+- [x] **AC-4:** Ketika `--force` diberikan, maka file tujuan yang sudah ada ditimpa.
+- [x] **AC-5 (sebagian gagal):** Ketika satu file di tengah batch rusak, maka file lain tetap dikonversi, ringkasan mencantumkan file yang gagal beserta alasannya, dan exit code 1.
+- [x] **AC-6:** Ketika semua file berhasil, maka exit code 0.
+- [x] **AC-7:** Ketika dua file sumber menghasilkan nama tujuan yang sama (mis. `a.png` dan `a.webp` → `jpg`), maka yang kedua tidak menimpa yang pertama tanpa `--force`.
 
 ### Di luar REQ ini
 - Rename otomatis seperti `a (1).jpg` (tidak dipilih di D-008).

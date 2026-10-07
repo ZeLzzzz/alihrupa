@@ -10,21 +10,26 @@ from conv import __version__
 from conv.converters import CONVERTERS, normalize, supported_table
 from conv.errors import ConvertError
 
+EXISTS = "{dst} sudah ada, tidak ditimpa (pakai --force untuk menimpa)"
 
-def publish(tmp: Path, dst: Path) -> None:
-    """Move the finished file into place without ever overwriting an existing one."""
+
+def publish(tmp: Path, dst: Path, force: bool) -> None:
+    """Move the finished file into place, never overwriting an existing one unless forced."""
+    if force:
+        os.replace(tmp, dst)
+        return
     try:
         os.link(tmp, dst)  # atomic, and fails if dst already exists
     except FileExistsError:
-        raise ConvertError(f"{dst} sudah ada, tidak ditimpa") from None
+        raise ConvertError(EXISTS.format(dst=dst)) from None
     except OSError:
         # Filesystems without hard links (e.g. FAT USB drives): check, then rename.
         if dst.exists():
-            raise ConvertError(f"{dst} sudah ada, tidak ditimpa") from None
+            raise ConvertError(EXISTS.format(dst=dst)) from None
         os.replace(tmp, dst)
 
 
-def convert_file(src: Path, target: str, target_ext: str) -> Path:
+def convert_file(src: Path, target: str, target_ext: str, out_dir: Path | None, force: bool) -> Path:
     if not src.exists():
         raise ConvertError("file tidak ditemukan")
     if not src.is_file():
@@ -38,16 +43,21 @@ def convert_file(src: Path, target: str, target_ext: str) -> Path:
     if converter is None:
         raise ConvertError(f"konversi {source} → {target} tidak didukung (lihat conv --help)")
 
-    dst = src.with_suffix(f".{target_ext}")
-    if dst.exists():
-        raise ConvertError(f"{dst} sudah ada, tidak ditimpa")
+    dst = (out_dir or src.parent) / f"{src.stem}.{target_ext}"
+    if dst.exists() and not force:
+        raise ConvertError(EXISTS.format(dst=dst))
     # Write next to the destination first, so a failed conversion never leaves a half-written result.
-    fd, name = tempfile.mkstemp(dir=dst.parent, prefix=f".{dst.stem}.", suffix=".conv-tmp")
+    try:
+        fd, name = tempfile.mkstemp(dir=dst.parent, prefix=f".{dst.stem}.", suffix=".conv-tmp")
+    except OSError as e:
+        raise ConvertError(f"tidak bisa menulis ke {dst.parent} ({e})") from None
     os.close(fd)
     tmp = Path(name)
     try:
         converter(src, tmp, target)
-        publish(tmp, dst)
+        publish(tmp, dst, force)
+    except OSError as e:
+        raise ConvertError(f"gagal menyimpan {dst} ({e})") from None
     finally:
         tmp.unlink(missing_ok=True)
     return dst
@@ -57,25 +67,40 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
         prog="conv",
         description="Konversi file antarformat secara lokal. File tidak pernah keluar dari komputer ini.",
-        epilog=f"contoh:\n  conv foto.png jpg\n  conv *.webp png\n\nkonversi yang didukung:\n{supported_table()}",
+        epilog=f"contoh:\n  conv foto.png jpg\n  conv *.webp png -o hasil/\n\nkonversi yang didukung:\n{supported_table()}",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("files", nargs="+", type=Path, help="file yang akan dikonversi")
     p.add_argument("format", help="format tujuan, mis. jpg, png, webp")
+    p.add_argument("-o", "--output", type=Path, help="folder hasil (bawaan: folder yang sama dengan file asli)")
+    p.add_argument("-f", "--force", action="store_true", help="timpa file hasil yang sudah ada")
     p.add_argument("-V", "--version", action="version", version=f"conv {__version__}")
     args = p.parse_args(argv)
 
     target_ext = args.format.lower().lstrip(".")
     target = normalize(target_ext)
-    failed = 0
+    if args.output:
+        try:
+            args.output.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            print(f"conv: tidak bisa membuat folder {args.output} ({e})", file=sys.stderr)
+            return 1
+
+    failed: list[tuple[Path, str]] = []
     for src in args.files:
         try:
-            dst = convert_file(src, target, target_ext)
+            dst = convert_file(src, target, target_ext, args.output, args.force)
         except ConvertError as e:
-            failed += 1
+            failed.append((src, str(e)))
             print(f"conv: {src}: {e}", file=sys.stderr)
             continue
         print(f"{src} → {dst}")
+
+    if len(args.files) > 1:
+        ok = len(args.files) - len(failed)
+        print(f"\nSelesai: {ok} berhasil, {len(failed)} gagal", file=sys.stderr)
+        for src, reason in failed:
+            print(f"  ✗ {src}: {reason}", file=sys.stderr)
     return 1 if failed else 0
 
 
