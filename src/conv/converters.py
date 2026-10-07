@@ -3,14 +3,15 @@
 from collections.abc import Callable
 from pathlib import Path
 
-from conv import images
+from conv import images, svg
 
 Converter = Callable[[Path, Path, str], None]
 
 ALIASES = {"jpeg": "jpg"}
 
 CONVERTERS: dict[tuple[str, str], Converter] = {
-    (s, d): images.convert for s in images.RASTER for d in images.RASTER if s != d
+    **{(s, d): images.convert for s in images.RASTER for d in images.RASTER if s != d},
+    ("svg", "png"): svg.convert,
 }
 
 

@@ -6,7 +6,7 @@
 |---|---|---|---|
 | REQ-001 | Konversi satu gambar PNG/JPG/WEBP ke format lain | done | — |
 | REQ-002 | Output aman dan batch: `-o`, `--force`, banyak file, ringkasan, exit code | done | REQ-001 |
-| REQ-003 | Konversi SVG → PNG | ready | REQ-001 |
+| REQ-003 | Konversi SVG → PNG | done | REQ-001 |
 | REQ-004 | Konversi PDF → DOCX | ready | REQ-001 |
 | REQ-005 | Konversi DOCX → PDF (tanpa LibreOffice) | ready | REQ-001 |
 | REQ-006 | Konversi Markdown/TXT → DOCX | ready | REQ-001 |
@@ -60,16 +60,16 @@
 
 ## REQ-003 — Konversi SVG → PNG
 
-**Status:** ready
+**Status:** done
 **Tujuan:** Pengguna bisa mengubah gambar vektor SVG menjadi PNG.
 **Bergantung pada:** REQ-001
 **Keputusan terkait:** D-009
 
 ### Acceptance criteria
-- [ ] **AC-1 (alur utama):** Ketika menjalankan `conv logo.svg png`, maka `logo.png` dibuat sesuai ukuran yang didefinisikan di SVG, dan latar transparan tetap transparan.
-- [ ] **AC-2 (input tidak valid):** Ketika SVG tidak valid, maka muncul pesan gagal yang menyebut nama file, dan tidak ada PNG yang tertinggal.
-- [ ] **AC-3:** Ketika SVG mereferensikan sumber eksternal via URL, maka sumber itu tidak diunduh (G-001); konversi tetap berjalan tanpa sumber tersebut.
-- [ ] **AC-4:** Ketika diminta SVG → JPG/WEBP atau raster → SVG, maka muncul pesan tidak didukung.
+- [x] **AC-1 (alur utama):** Ketika menjalankan `conv logo.svg png`, maka `logo.png` dibuat sesuai ukuran yang didefinisikan di SVG, dan latar transparan tetap transparan.
+- [x] **AC-2 (input tidak valid):** Ketika SVG tidak valid, maka muncul pesan gagal yang menyebut nama file, dan tidak ada PNG yang tertinggal.
+- [x] **AC-3:** Ketika SVG mereferensikan sumber eksternal via URL, maka sumber itu tidak diunduh (G-001); konversi tetap berjalan tanpa sumber tersebut.
+- [x] **AC-4:** Ketika diminta SVG → JPG/WEBP atau raster → SVG, maka muncul pesan tidak didukung.
 
 ### Di luar REQ ini
 - Mengatur resolusi/ukuran output.
