@@ -1,5 +1,6 @@
 """REQ-005 (DOCX → PDF), REQ-006 (Markdown/TXT → DOCX), REQ-007 (Markdown/TXT → PDF)."""
 
+import io
 import pathlib
 
 import docx
@@ -32,6 +33,9 @@ def listing(path):
 def pdf_text(path):
     with pymupdf.open(path) as doc:
         return "\n".join(page.get_text() for page in doc)
+
+
+W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
 
 
 def make_docx(path, header=None, footer=None, textbox=None):
@@ -68,6 +72,13 @@ def test_markdown_to_docx_keeps_formatting(tmp_path):
     assert any(r.italic and r.text == "miring" for r in para.runs)
     assert "satu" in by_text and "pertama" in by_text
     assert 'print("halo")' in by_text
+
+
+def test_emoji_and_accents_survive(tmp_path):
+    source = tmp_path / "emoji.md"
+    source.write_text("Selamat 🎉 café\n", encoding="utf-8")
+    assert main([str(source), "docx"]) == 0
+    assert "Selamat 🎉 café" in [p.text for p in docx.Document(tmp_path / "emoji.docx").paragraphs]
 
 
 def test_markdown_extension_alias(tmp_path):
@@ -145,6 +156,53 @@ def test_docx_dropped_parts_are_reported(tmp_path, capsys):
     err = capsys.readouterr().err
     assert "header" in err and "footer" in err and "text box" in err
     assert "Isi utama dokumen." in pdf_text(tmp_path / "kop.pdf")
+
+
+def test_docx_rich_content_in_pdf(tmp_path):
+    d = docx.Document()
+    d.add_heading("Judul", 1)
+    p = d.add_paragraph()
+    p.add_run("TEBAL").bold = True
+    p.add_run(" dan ")
+    p.add_run("MIRING").italic = True
+    d.add_paragraph("butir satu", style="List Bullet")
+    table = d.add_table(rows=2, cols=2)
+    table.cell(0, 0).text, table.cell(1, 1).text = "SEL-A", "SEL-D"
+    buf = io.BytesIO()
+    Image.new("RGB", (60, 30), (0, 200, 0)).save(buf, "PNG")
+    buf.seek(0)
+    d.add_picture(buf)
+    d.save(tmp_path / "kaya.docx")
+
+    assert main([str(tmp_path / "kaya.docx"), "pdf"]) == 0
+    with pymupdf.open(tmp_path / "kaya.pdf") as doc:
+        page = doc[0]
+        fonts = {s["text"]: s["font"] for b in page.get_text("dict")["blocks"]
+                 for line in b.get("lines", []) for s in line["spans"]}
+        assert "Bold" in fonts["TEBAL"] and "Italic" in fonts["MIRING"]
+        assert {"butir satu", "SEL-A", "SEL-D"} <= fonts.keys()
+        assert len(page.get_images()) == 1
+
+
+def test_empty_header_is_not_reported(tmp_path, capsys):
+    """Word's default header holds only tab stops; that is not lost content."""
+    d = docx.Document()
+    d.add_paragraph("Isi.")
+    d.sections[0].header.paragraphs[0]._p.get_or_add_pPr().append(
+        parse_xml(f'<w:tabs {W}><w:tab w:val="center" w:pos="4680"/></w:tabs>')
+    )
+    d.save(tmp_path / "header_kosong.docx")
+    assert main([str(tmp_path / "header_kosong.docx"), "pdf"]) == 0
+    assert "peringatan" not in capsys.readouterr().err
+
+
+def test_columns_are_reported(tmp_path, capsys):
+    d = docx.Document()
+    d.add_paragraph("Kolom.")
+    d.sections[0]._sectPr.append(parse_xml(f'<w:cols {W} w:space="720" w:num="2"/>'))
+    d.save(tmp_path / "kolom.docx")
+    assert main([str(tmp_path / "kolom.docx"), "pdf"]) == 0
+    assert "tata letak kolom" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("content", [b"bukan zip", b"PK\x03\x04rusak"])

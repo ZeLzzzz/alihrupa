@@ -50,6 +50,11 @@ def pandoc(src: Path, args: list[str], cwd: Path | None = None) -> None:
         warn(src, f"{len(remote)} gambar dari URL tidak diunduh dan diganti keterangannya")
 
 
+def has_text(xml: str) -> bool:
+    """Whether a WordprocessingML part holds visible text (not just <w:tabs>, empty paragraphs, …)."""
+    return any(t.strip() for t in re.findall(r"<w:t(?:\s[^>]*)?>([^<]*)</w:t>", xml))
+
+
 def lost_docx_parts(src: Path) -> list[str]:
     """Parts of a DOCX that pandoc drops without saying so."""
     try:
@@ -60,9 +65,9 @@ def lost_docx_parts(src: Path) -> list[str]:
     except (zipfile.BadZipFile, KeyError):
         raise ConvertError("bukan file DOCX yang valid") from None
     lost = []
-    if any("<w:t" in xml for name, xml in extra.items() if "header" in name):
+    if any(has_text(xml) for name, xml in extra.items() if "header" in name):
         lost.append("header")
-    if any("<w:t" in xml for name, xml in extra.items() if "footer" in name):
+    if any(has_text(xml) for name, xml in extra.items() if "footer" in name):
         lost.append("footer")
     if "txbxContent" in body:
         lost.append("text box")

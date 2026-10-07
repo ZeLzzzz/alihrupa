@@ -20,7 +20,7 @@
 **Status:** done
 **Tujuan:** Pengguna bisa mengonversi satu gambar antar PNG, JPG, dan WEBP dengan satu perintah, sehingga tidak perlu membuka aplikasi atau situs.
 **Bergantung pada:** —
-**Keputusan terkait:** D-004, D-009, D-010
+**Keputusan terkait:** D-004, D-009, D-010, D-022, D-023
 
 ### Acceptance criteria
 - [x] **AC-1 (alur utama):** Ketika menjalankan `conv foto.png jpg`, maka `foto.jpg` dibuat di folder yang sama dan path hasilnya dicetak di terminal; exit code 0.
@@ -28,7 +28,7 @@
 - [x] **AC-3:** Ketika PNG atau WEBP transparan dikonversi ke JPG, maka area transparan menjadi putih (bukan hitam).
 - [x] **AC-4 (input tidak valid):** Ketika pasangan format tidak didukung (mis. `conv foto.png mp3`), maka muncul pesan yang menyebut pasangan tersebut tidak didukung, tidak ada file dibuat, dan exit code 1.
 - [x] **AC-5 (gagal):** Ketika file tidak ditemukan atau isinya bukan gambar valid (rusak/berekstensi salah), maka muncul pesan yang menyebut nama file dan alasannya, tidak ada file hasil yang tertinggal, dan exit code 1.
-- [x] **AC-6:** Ketika format sumber sama dengan tujuan (mis. `conv a.png png`), maka muncul pesan bahwa file sudah dalam format itu, dan file tidak diubah.
+- [x] **AC-6:** Ketika format sumber sama dengan tujuan (mis. `conv a.png png`), maka muncul pesan bahwa file sudah dalam format itu, file tidak diubah, dan exit code 1 (D-022).
 - [x] **AC-7:** `conv --help` menampilkan cara pakai dan daftar format yang didukung.
 
 ### Di luar REQ ini
@@ -121,7 +121,7 @@
 **Status:** done
 **Tujuan:** Pengguna bisa mengubah catatan Markdown atau teks biasa menjadi DOCX.
 **Bergantung pada:** REQ-001
-**Keputusan terkait:** D-006, D-019
+**Keputusan terkait:** D-006, D-019, D-024
 
 ### Acceptance criteria
 - [x] **AC-1 (alur utama):** Ketika menjalankan `conv catatan.md docx`, maka `catatan.docx` dibuat, dan heading, paragraf, daftar (bullet/bernomor), teks tebal/miring, serta blok kode tampil dengan format yang sesuai.
@@ -141,7 +141,7 @@
 **Status:** done
 **Tujuan:** Pengguna bisa mengubah Markdown/TXT langsung ke PDF dengan satu perintah.
 **Bergantung pada:** REQ-001
-**Keputusan terkait:** D-019, D-020
+**Keputusan terkait:** D-019, D-020, D-024
 
 ### Acceptance criteria
 - [x] **AC-1 (alur utama):** Ketika menjalankan `conv catatan.md pdf`, maka `catatan.pdf` dibuat, dan heading, paragraf, list, teks tebal/miring, serta blok kode tampil dengan format yang sesuai.

@@ -76,6 +76,20 @@ def test_exif_rotation_is_applied(tmp_path):
         assert im.size == (10, 20)
 
 
+@pytest.mark.parametrize(("src", "dst"), list(itertools.permutations(FORMATS, 2)))
+def test_exif_and_gps_are_not_copied(tmp_path, src, dst):
+    """D-023: README promises that metadata such as GPS location does not leak into results."""
+    exif = Image.Exif()
+    exif[0x010F] = "MerekKamera"
+    exif[0x8825] = {1: "S", 2: (6.0, 12.0, 0.0)}
+    source = tmp_path / f"foto.{src}"
+    Image.new("RGB", (20, 10), "red").save(source, FORMATS[src], exif=exif)
+    assert main([str(source), dst]) == 0
+    with Image.open(tmp_path / f"foto.{dst}") as im:
+        assert not im.getexif()
+        assert not im.info.get("exif")
+
+
 def test_palette_png_with_transparency_to_jpg(tmp_path):
     source = tmp_path / "ikon.png"
     Image.new("RGBA", (8, 8), (0, 0, 0, 0)).convert("P").save(source, "PNG", transparency=0)

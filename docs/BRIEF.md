@@ -44,5 +44,4 @@ Mengonversi file antarformat (PDF ↔ DOCX, PNG ↔ JPG, dan lainnya) biasanya d
 ## Celah yang diketahui
 - DOCX → PDF menyusun ulang dokumen, jadi tampilannya tidak identik dengan Word untuk layout rumit (kop surat, text box, header/footer, kolom). Batasan ini diterima user (D-020).
 - Kualitas PDF → DOCX bergantung pada library. Layout rumit (kolom, tabel kompleks) tidak dijamin sama persis. Ini batasan yang diterima, bukan bug.
-- Lisensi library PDF dan dampaknya terhadap lisensi proyek belum diputuskan (D-017).
-- Mesin ringan untuk dokumen belum dipilih dan belum diuji (D-019).
+- Instalasi sekitar 570 MB karena pandoc, Typst, PyMuPDF, dan OpenCV (dari pdf2docx) dibundel. Tetap tanpa paket sistem.

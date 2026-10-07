@@ -21,6 +21,13 @@ def test_svg_to_png_keeps_size_and_transparency(tmp_path):
         assert im.getpixel((30, 5))[3] == 0  # outside the rect stays transparent
 
 
+def test_namespace_urls_are_not_reported_as_remote(tmp_path, capsys):
+    source = tmp_path / "logo.svg"
+    source.write_text(LOGO.replace("<svg ", '<svg xmlns:xlink="http://www.w3.org/1999/xlink" '))
+    assert main([str(source), "png"]) == 0
+    assert "peringatan" not in capsys.readouterr().err
+
+
 @pytest.mark.parametrize("content", ["<svg", "bukan svg", ""])
 def test_invalid_svg(tmp_path, capsys, content):
     source = tmp_path / "rusak.svg"
@@ -30,7 +37,7 @@ def test_invalid_svg(tmp_path, capsys, content):
     assert sorted(p.name for p in tmp_path.iterdir()) == ["rusak.svg"]
 
 
-def test_remote_images_are_not_downloaded(tmp_path, http_server):
+def test_remote_images_are_not_downloaded(tmp_path, capsys, http_server):
     base, requests = http_server
     source = tmp_path / "remote.svg"
     source.write_text(
@@ -39,6 +46,7 @@ def test_remote_images_are_not_downloaded(tmp_path, http_server):
     )
     assert main([str(source), "png"]) == 0  # G-001: renders without the remote image
     assert requests == []
+    assert "1 sumber dari URL tidak diunduh" in capsys.readouterr().err
 
 
 def test_relative_local_image_is_included(tmp_path):

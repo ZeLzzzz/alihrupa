@@ -55,14 +55,14 @@ The CLI messages are in Indonesian, because that is what the author uses.
 
 ### Exit codes and output
 
-Each successful conversion prints `source → result` on stdout. Errors and warnings go to stderr. The exit code is `0` when every file was converted and `1` otherwise, including files skipped because the result already exists.
+Each successful conversion prints `source → result` on stdout. Errors and warnings go to stderr. The exit code is `0` when every file was converted and `1` otherwise, including files skipped because the result already exists or because the file is already in the target format.
 
 ## Known limitations
 
 - **PDF → DOCX** works well for text-based PDFs. Complex layouts (columns, intricate tables) are not reproduced exactly.
 - **Scanned PDFs** have no text layer, so the DOCX contains images only. OCR is not supported; `conv` warns when this happens.
 - **DOCX → PDF** rebuilds the document instead of rendering it like Word does. Text, headings, lists, tables and images are kept, but the result does not look identical. Headers, footers, text boxes and multi-column layouts are lost; `conv` warns about each of them.
-- **Images referenced by URL** in Markdown or SVG are not downloaded. They are replaced by their description, with a warning.
+- **Images referenced by URL** in Markdown or SVG are not downloaded. In Markdown they are replaced by their description; in SVG they are left out. Either way `conv` warns.
 - Markdown and TXT files must be UTF-8.
 - Image conversion only changes the format: no resizing or quality settings. Transparent areas become white in JPG. EXIF metadata (including GPS location) is not copied; the photo's rotation is applied to the pixels instead.
 - Linux only for now. Windows and macOS may work but are untested.
