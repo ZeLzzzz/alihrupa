@@ -18,7 +18,7 @@ Mengonversi file antarformat (PDF ↔ DOCX, PNG ↔ JPG, dan lainnya) biasanya d
 - Hasil di samping file asli atau di folder `-o`; tidak menimpa tanpa `--force`.
 - Batch tetap berjalan meski ada file yang gagal, dengan ringkasan dan exit code.
 - Ukuran kertas hasil PDF bisa dipilih dengan `-p/--paper` (A4, A5, A3, Letter, Legal, F4); bawaan A4, atau ukuran halaman DOCX untuk sumber DOCX (D-027, D-030).
-- DOCX → PDF mengikuti tata letak dasar DOCX: margin, huruf, spasi, perataan isi, pemenggalan, nomor halaman (D-029).
+- DOCX → PDF mengikuti tata letak dasar DOCX: margin, huruf, spasi, perataan isi, pemenggalan, nomor halaman (D-029), serta gaya heading dan indentasi baris pertama (D-032).
 - Tanpa aplikasi office: DOCX → PDF dan Markdown/TXT → PDF memakai mesin ringan yang menyusun ulang isi dokumen (D-020).
 - Instalasi yang bisa diikuti orang lain dan README.
 

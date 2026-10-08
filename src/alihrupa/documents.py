@@ -8,7 +8,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-from alihrupa.docx_layout import SUBSTITUTES, Layout, page_number_only, read_layout
+from alihrupa.docx_layout import SUBSTITUTES, Heading, Layout, page_number_only, read_layout
 from alihrupa.errors import ConvertError, warn
 
 NO_REMOTE = Path(__file__).with_name("no_remote.lua")
@@ -126,6 +126,51 @@ def typst_str(text: str) -> str:
     return '"' + text.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
+def top_edge(line: tuple[str, float], size: float) -> str:
+    """Typst top-edge that gives each line the height Word gives it; the extra space sits above the text."""
+    rule, value = line
+    if rule == "auto":
+        return f"{value * WORD_LINE - DESCENT:.4f}em"
+    box = value if rule == "exact" else max(value, WORD_LINE * size)
+    return f"{box - DESCENT * size:.3f}pt"
+
+
+def heading_rule(level: int, h: Heading, layout: Layout) -> str:
+    """A show rule that makes Typst's heading of this level look like the DOCX's style (D-032)."""
+    size = h.size or layout.size or DEFAULT_SIZE
+    text = []
+    if h.size:
+        text.append(f"size: {h.size:g}pt")
+    if h.bold is not None:
+        text.append(f'weight: "{"bold" if h.bold else "regular"}"')
+    if h.italic is not None:
+        text.append(f'style: "{"italic" if h.italic else "normal"}"')
+    if h.color:
+        text.append(f'fill: rgb("#{h.color}")')
+    if h.font:
+        text.append(f"font: ({typst_str(h.font)},)")
+    if h.line:
+        text.append(f"top-edge: {top_edge(h.line, size)}")
+    # Word adds the previous paragraph's space after to the heading's space before, and the same below.
+    block = ["sticky: true", "width: 100%"]
+    if h.before is not None:
+        block.append(f"above: {h.before + layout.after:.2f}pt")
+    if h.after is not None:
+        block.append(f"below: {h.after + layout.before:.2f}pt")
+    body = "it.body"
+    if h.align:
+        body = f"align({'center' if h.align == 'center' else 'right' if h.align == 'right' else 'left'}, it.body)"
+    rule = [f"show heading.where(level: {level}): it => {{"]
+    if h.page_break:
+        rule.append("  pagebreak(weak: true)")
+    if text:
+        rule.append(f"  set text({', '.join(text)})")
+    if h.align:
+        rule.append(f"  set par(justify: {'true' if h.align == 'both' else 'false'})")
+    rule += [f"  block({', '.join(block)}, {body})", "}"]
+    return "\n".join(rule)
+
+
 def docx_conf(layout: Layout, paper: str | None, font: str | None) -> str:
     """A replacement for the `conf` function of pandoc's Typst template, laid out like the DOCX.
 
@@ -136,22 +181,23 @@ def docx_conf(layout: Layout, paper: str | None, font: str | None) -> str:
     top, right, bottom, left = layout.margins or (DEFAULT_MARGIN,) * 4
     size = layout.size or DEFAULT_SIZE
     # Like Word, every line box is one full line high, with the extra space above the text.
-    rule, value = layout.line
-    if rule == "auto":
-        top_edge = f"{value * WORD_LINE - DESCENT:.4f}em"
-    else:
-        box = value if rule == "exact" else max(value, WORD_LINE * size)
-        top_edge = f"{box - DESCENT * size:.3f}pt"
+    body_edge = top_edge(layout.line, size)
+    indent_rules = ""
+    if layout.indent:
+        indent_rules = (f"  set par(first-line-indent: (amount: {layout.indent:.2f}mm, all: true))\n"
+                        + "".join(f"  show {el}: set par(first-line-indent: 0pt)\n" for el in ("table", "list", "enum", "terms")))
+    heading_rules = "".join(f"  {heading_rule(n, h, layout)}\n".replace("\n", "\n  ").rstrip(" ")
+                            for n, h in sorted(layout.headings.items()))
     font_rule = f"  set text(font: ({typst_str(font)},))\n" if font else ""
     return f"""#let conf(..args) = {{
   let a = args.named()
   set page(width: {width:.2f}mm, height: {height:.2f}mm,
     margin: (top: {top:.2f}mm, right: {right:.2f}mm, bottom: {bottom:.2f}mm, left: {left:.2f}mm),
     numbering: {'"1"' if layout.page_numbers else "none"})
-  set text(lang: a.at("lang", default: "en"), size: {size}pt, top-edge: {top_edge}, bottom-edge: -{DESCENT}em,
+  set text(lang: a.at("lang", default: "en"), size: {size}pt, top-edge: {body_edge}, bottom-edge: -{DESCENT}em,
     hyphenate: {"true" if layout.hyphenate else "false"}, overhang: false)
 {font_rule}  set par(leading: 0pt, spacing: {layout.before + layout.after:.2f}pt, justify: {"true" if layout.justify else "false"})
-  // Title paragraphs of the DOCX (Title/Subtitle styles), which pandoc moves out of the body
+{indent_rules}{heading_rules}  // Title paragraphs of the DOCX (Title/Subtitle styles), which pandoc moves out of the body
   if a.at("title", default: none) != none {{ align(center, text(weight: "bold", size: 1.5em, a.title)) }}
   if a.at("subtitle", default: none) != none {{ align(center, text(weight: "bold", size: 1.25em, a.subtitle)) }}
   let authors = a.at("authors", default: ())
@@ -184,6 +230,15 @@ def to_pdf(src: Path, dst: Path, fmt: str, paper: str | None = None) -> None:
             font = pick_font(layout.font) if layout.font else None
             if layout.font and not font:
                 warn(src, f"font {layout.font} tidak terpasang (begitu juga penggantinya), memakai font bawaan")
+            missing = {layout.font} if layout.font and not font else set()
+            for h in layout.headings.values():
+                if not h.font:
+                    continue
+                picked = pick_font(h.font)
+                if not picked and h.font not in missing:
+                    warn(src, f"font {h.font} (heading) tidak terpasang (begitu juga penggantinya), memakai font isi")
+                    missing.add(h.font)
+                h.font = picked
             (work / "conf.typ").write_text(docx_conf(layout, paper, font), encoding="utf-8")
             args = ["-H", "conf.typ"]
         else:

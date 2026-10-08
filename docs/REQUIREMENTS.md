@@ -14,6 +14,7 @@
 | REQ-008 | Instalasi dan README untuk pengguna lain | done | REQ-001 |
 | REQ-009 | Memilih ukuran kertas hasil PDF dengan `-p/--paper` | done | REQ-005, REQ-007 |
 | REQ-010 | DOCX → PDF mengikuti tata letak dasar DOCX | done | REQ-005, REQ-009 |
+| REQ-011 | DOCX → PDF mengikuti gaya heading dan indentasi baris pertama | done | REQ-010 |
 
 ---
 
@@ -215,5 +216,29 @@
 
 ### Di luar REQ ini
 - Perataan dan ukuran huruf per paragraf, mis. judul yang ditengahkan langsung (D-031).
-- Gaya heading, indentasi baris pertama, header/footer selain nomor halaman, kolom, text box.
+- Gaya heading dan indentasi baris pertama (dikerjakan di REQ-011), header/footer selain nomor halaman, kolom, text box.
+- Membundel font.
+
+---
+
+## REQ-011 — DOCX → PDF mengikuti gaya heading dan indentasi baris pertama
+
+**Status:** done
+**Tujuan:** Judul bab dan paragraf di PDF tampil seperti di DOCX (judul ditengahkan, bab baru di halaman baru, paragraf menjorok), sehingga makalah dan laporan berbab tidak terlihat seperti dokumen lain.
+**Bergantung pada:** REQ-010
+**Keputusan terkait:** D-029, D-032, D-033
+
+### Acceptance criteria
+- [x] **AC-1 (perataan, ukuran, gaya huruf):** Setiap tingkat heading (1–9) mengikuti gayanya di DOCX: perataan (kiri, tengah, kanan), ukuran huruf, tebal, dan miring. Mis. Heading 1 tengah 14 pt tebal dan Heading 2 kiri 12 pt tebal tampil begitu di PDF.
+- [x] **AC-2 (warna dan jenis huruf):** Warna heading sama dengan gayanya (heading bawaan Word berwarna biru tetap biru). Jenis huruf heading memakai font gayanya atau penggantinya yang setara (D-029); kalau tidak ada, font isi dipakai dan muncul peringatan yang menyebut nama font.
+- [x] **AC-3 (jarak):** Jarak sebelum dan sesudah heading serta spasi barisnya mengikuti gaya (selisih ≤ 1 pt atau ≤ 5%), dihitung dengan cara yang sama dengan REQ-010 AC-3.
+- [x] **AC-4 (halaman baru):** Heading yang gayanya memakai "mulai di halaman baru" (`pageBreakBefore`) selalu mulai di atas halaman. Tidak ada halaman kosong ketika heading itu sudah di awal dokumen atau di awal halaman.
+- [x] **AC-5 (indentasi):** Baris pertama paragraf isi menjorok sebesar indentasi dominan di DOCX (selisih ≤ 0,5 mm), termasuk paragraf pertama setelah heading. Paragraf di dalam tabel dan daftar tidak menjorok. DOCX tanpa indentasi tampil seperti sebelumnya.
+- [x] **AC-6 (gaya tidak ada):** Ketika DOCX tidak punya gaya untuk suatu tingkat heading atau tidak menyebut sebuah nilai, maka tingkat/nilai itu tampil seperti sebelum REQ ini dan konversi tetap berhasil.
+- [x] **AC-7 (nilai tidak valid):** Ketika nilai di gaya tidak masuk akal (ukuran huruf nol atau di atas 400 pt, indentasi negatif atau selebar teks, warna bukan heksadesimal, jarak negatif atau lebih tinggi dari halaman), maka nilai itu diabaikan dan konversi tetap berhasil. DOCX rusak tetap gagal seperti REQ-005 AC-5.
+- [x] **AC-8 (tidak berubah):** MD/TXT → PDF tidak berubah, dan DOCX tanpa gaya heading maupun indentasi menghasilkan PDF yang sama dengan REQ-010.
+
+### Di luar REQ ini
+- Section dan nomor halaman (romawi, penomoran ulang, tanpa nomor di sampul), tabel, dan format langsung per paragraf (D-033, D-031).
+- Penomoran heading otomatis dari daftar bertingkat Word, gaya Title/Subtitle, hanging indent (mis. daftar pustaka), blok kutipan, dan daftar isi.
 - Membundel font.
