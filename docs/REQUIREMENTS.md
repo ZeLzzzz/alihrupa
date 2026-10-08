@@ -12,6 +12,7 @@
 | REQ-006 | Konversi Markdown/TXT → DOCX | done | REQ-001 |
 | REQ-007 | Konversi Markdown/TXT → PDF | done | REQ-001 |
 | REQ-008 | Instalasi dan README untuk pengguna lain | done | REQ-001 |
+| REQ-009 | Memilih ukuran kertas hasil PDF dengan `-p/--paper` | done | REQ-005, REQ-007 |
 
 ---
 
@@ -170,3 +171,24 @@
 
 ### Di luar REQ ini
 - Paket AUR/PyPI otomatis dan dukungan Windows/macOS.
+
+---
+
+## REQ-009 — Ukuran kertas hasil PDF
+
+**Status:** done
+**Tujuan:** Pengguna bisa memilih ukuran kertas PDF hasil konversi, sehingga dokumen bisa langsung dicetak di kertas F4, Letter, dan lainnya, bukan hanya A4.
+**Bergantung pada:** REQ-005, REQ-007
+**Keputusan terkait:** D-027, D-028
+
+### Acceptance criteria
+- [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa laporan.docx pdf -p f4`, maka setiap halaman `laporan.pdf` berukuran 215×330 mm. Berlaku juga untuk sumber Markdown dan TXT.
+- [x] **AC-2:** `a4`, `a5`, `a3`, `letter`, dan `legal` masing-masing menghasilkan 210×297, 148×210, 297×420, 216×279, dan 216×356 mm. Bentuk panjang `--paper` dan huruf besar (`-p F4`) juga diterima.
+- [x] **AC-3:** Tanpa `-p`, PDF tetap A4 seperti sebelumnya.
+- [x] **AC-4 (input tidak valid):** Ketika ukurannya tidak dikenal (`-p b5`), maka muncul pesan yang menyebut ukuran yang tersedia, exit code 2, dan tidak ada file yang dibuat.
+- [x] **AC-5 (input tidak valid):** Ketika `-p` dipakai dengan tujuan selain PDF (`alihrupa foto.png jpg -p f4`), maka muncul pesan bahwa `--paper` hanya untuk hasil PDF, exit code 2, dan tidak ada file yang dibuat.
+- [x] **AC-6:** `alihrupa --help` mencantumkan opsi `-p/--paper` beserta daftar ukurannya; README menjelaskannya.
+
+### Di luar REQ ini
+- Orientasi landscape (D-028), margin khusus, dan ukuran bebas (mis. `210x330mm`).
+- Ukuran kertas untuk hasil DOCX (MD/TXT → DOCX, PDF → DOCX).

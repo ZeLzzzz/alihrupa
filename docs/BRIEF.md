@@ -17,6 +17,7 @@ Mengonversi file antarformat (PDF ↔ DOCX, PNG ↔ JPG, dan lainnya) biasanya d
 - Dokumen: PDF → DOCX, DOCX → PDF, Markdown/TXT → DOCX, dan Markdown/TXT → PDF.
 - Hasil di samping file asli atau di folder `-o`; tidak menimpa tanpa `--force`.
 - Batch tetap berjalan meski ada file yang gagal, dengan ringkasan dan exit code.
+- Ukuran kertas hasil PDF bisa dipilih dengan `-p/--paper` (A4, A5, A3, Letter, Legal, F4); bawaan A4 (D-027).
 - Tanpa aplikasi office: DOCX → PDF dan Markdown/TXT → PDF memakai mesin ringan yang menyusun ulang isi dokumen (D-020).
 - Instalasi yang bisa diikuti orang lain dan README.
 
@@ -26,7 +27,7 @@ Mengonversi file antarformat (PDF ↔ DOCX, PNG ↔ JPG, dan lainnya) biasanya d
 - OCR untuk PDF hasil scan (ditunda).
 - Edit PDF: merge, split, kompres (ditunda).
 - Opsi gambar selain ganti format (kualitas, resize).
-- Opsi ukuran kertas PDF; v1 selalu A4 (fitur mendatang, D-025).
+- Orientasi landscape untuk PDF (fitur mendatang, D-028).
 - Dukungan resmi Windows/macOS (nice-to-have, bukan v1).
 - Layanan atau API online apa pun.
 - Ketergantungan pada LibreOffice, Microsoft Word, atau aplikasi office lain (D-020).

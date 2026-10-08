@@ -12,6 +12,10 @@ from alihrupa.errors import ConvertError, warn
 NO_REMOTE = Path(__file__).with_name("no_remote.lua")
 REMOTE_MARKER = "alihrupa-remote-image\t"
 
+# Typst paper names per paper size (D-027). F4 has no Typst preset: it starts as A4 and gets its real size in to_pdf.
+PAPERS = {"a4": "a4", "a5": "a5", "a3": "a3", "letter": "us-letter", "legal": "us-legal", "f4": "a4"}
+F4_PAGE = "width: 215mm, height: 330mm,"
+
 
 def read_text(src: Path) -> str:
     try:
@@ -80,14 +84,29 @@ def to_docx(src: Path, dst: Path, fmt: str) -> None:
     pandoc(src, ["-t", "docx", "-o", str(dst.resolve())])
 
 
-def to_pdf(src: Path, dst: Path, fmt: str) -> None:
+def set_f4(typ: Path) -> None:
+    """Swap the paper preset in pandoc's page setup for F4 dimensions.
+
+    A `#set page` inside the body would not work: pandoc's template always emits a title block first,
+    so Typst would start a new page and leave an empty A4 page in front.
+    """
+    source = typ.read_text(encoding="utf-8")
+    patched = source.replace("paper: paper,", F4_PAGE, 1)
+    if patched == source:
+        raise ConvertError("ukuran kertas F4 tidak bisa diatur dengan versi pandoc ini")
+    typ.write_text(patched, encoding="utf-8")
+
+
+def to_pdf(src: Path, dst: Path, fmt: str, paper: str = "a4") -> None:
     import typst
 
     lost = lost_docx_parts(src) if src.suffix.lower() == ".docx" else []
     with tempfile.TemporaryDirectory(prefix="alihrupa-") as tmp:
         work = Path(tmp)
         # Relative media paths, so Typst can resolve them inside its root folder.
-        pandoc(src, ["-t", "typst", "--standalone", "-V", "papersize=a4", "--extract-media=media", "-o", "doc.typ"], cwd=work)
+        pandoc(src, ["-t", "typst", "--standalone", "-V", f"papersize={PAPERS[paper]}", "--extract-media=media", "-o", "doc.typ"], cwd=work)
+        if paper == "f4":
+            set_f4(work / "doc.typ")
         try:
             pdf = typst.compile(str(work / "doc.typ"), root=str(work))
         except Exception as e:  # noqa: BLE001 - typst raises its own error types; show the message

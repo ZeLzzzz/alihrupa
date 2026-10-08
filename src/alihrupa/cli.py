@@ -1,6 +1,7 @@
 """Convert files between formats locally. Files never leave this machine."""
 
 import argparse
+import functools
 import os
 import sys
 import tempfile
@@ -8,6 +9,7 @@ from pathlib import Path
 
 from alihrupa import __version__
 from alihrupa.converters import CONVERTERS, normalize, supported_table
+from alihrupa.documents import PAPERS
 from alihrupa.errors import ConvertError
 
 EXISTS = "{dst} sudah ada, tidak ditimpa (pakai --force untuk menimpa)"
@@ -29,7 +31,7 @@ def publish(tmp: Path, dst: Path, force: bool) -> None:
         os.replace(tmp, dst)
 
 
-def convert_file(src: Path, target: str, target_ext: str, out_dir: Path | None, force: bool) -> Path:
+def convert_file(src: Path, target: str, target_ext: str, out_dir: Path | None, force: bool, paper: str = "a4") -> Path:
     if not src.exists():
         raise ConvertError("file tidak ditemukan")
     if not src.is_file():
@@ -42,6 +44,8 @@ def convert_file(src: Path, target: str, target_ext: str, out_dir: Path | None, 
     converter = CONVERTERS.get((source, target))
     if converter is None:
         raise ConvertError(f"konversi {source} → {target} tidak didukung (lihat alihrupa --help)")
+    if target == "pdf":
+        converter = functools.partial(converter, paper=paper)
 
     dst = (out_dir or src.parent) / f"{src.stem}.{target_ext}"
     if dst.exists() and not force:
@@ -67,18 +71,27 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
         prog="alihrupa",
         description="Konversi file antarformat secara lokal. File tidak pernah keluar dari komputer ini.",
-        epilog=f"contoh:\n  alihrupa foto.png jpg\n  alihrupa *.webp png -o hasil/\n\nkonversi yang didukung:\n{supported_table()}",
+        epilog=f"contoh:\n  alihrupa foto.png jpg\n  alihrupa *.webp png -o hasil/\n  alihrupa laporan.docx pdf -p f4\n\nkonversi yang didukung:\n{supported_table()}",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("files", nargs="+", type=Path, help="file yang akan dikonversi")
     p.add_argument("format", help="format tujuan, mis. jpg, png, webp")
     p.add_argument("-o", "--output", type=Path, help="folder hasil (bawaan: folder yang sama dengan file asli)")
     p.add_argument("-f", "--force", action="store_true", help="timpa file hasil yang sudah ada")
+    p.add_argument(
+        "-p", "--paper", metavar="UKURAN", type=str.lower,
+        help=f"ukuran kertas hasil PDF: {', '.join(PAPERS)} (bawaan: a4; f4 = 215×330 mm)",
+    )
     p.add_argument("-V", "--version", action="version", version=f"alihrupa {__version__}")
     args = p.parse_args(argv)
 
     target_ext = args.format.lower().lstrip(".")
     target = normalize(target_ext)
+    if args.paper is not None:
+        if args.paper not in PAPERS:
+            p.error(f"ukuran kertas tidak dikenal: {args.paper} (pilihan: {', '.join(PAPERS)})")
+        if target != "pdf":
+            p.error("--paper hanya untuk hasil PDF")
     if args.output:
         try:
             args.output.mkdir(parents=True, exist_ok=True)
@@ -89,7 +102,7 @@ def main(argv: list[str] | None = None) -> int:
     failed: list[tuple[Path, str]] = []
     for src in args.files:
         try:
-            dst = convert_file(src, target, target_ext, args.output, args.force)
+            dst = convert_file(src, target, target_ext, args.output, args.force, args.paper or "a4")
         except ConvertError as e:
             failed.append((src, str(e)))
             print(f"alihrupa: {src}: {e}", file=sys.stderr)
