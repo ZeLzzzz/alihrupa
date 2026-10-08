@@ -13,6 +13,7 @@
 | REQ-007 | Konversi Markdown/TXT → PDF | done | REQ-001 |
 | REQ-008 | Instalasi dan README untuk pengguna lain | done | REQ-001 |
 | REQ-009 | Memilih ukuran kertas hasil PDF dengan `-p/--paper` | done | REQ-005, REQ-007 |
+| REQ-010 | DOCX → PDF mengikuti tata letak dasar DOCX | done | REQ-005, REQ-009 |
 
 ---
 
@@ -192,3 +193,27 @@
 ### Di luar REQ ini
 - Orientasi landscape (D-028), margin khusus, dan ukuran bebas (mis. `210x330mm`).
 - Ukuran kertas untuk hasil DOCX (MD/TXT → DOCX, PDF → DOCX).
+
+---
+
+## REQ-010 — DOCX → PDF mengikuti tata letak dasar DOCX
+
+**Status:** done
+**Tujuan:** PDF dari DOCX memakai margin, huruf, spasi, dan perataan yang sama dengan dokumen aslinya, sehingga hasilnya tidak terasa seperti dokumen lain.
+**Bergantung pada:** REQ-005, REQ-009
+**Keputusan terkait:** D-020, D-029, D-030, D-031
+
+### Acceptance criteria
+- [x] **AC-1 (margin & kertas):** Margin tiap sisi PDF sama dengan margin DOCX (±0,5 mm). Tanpa `-p`, ukuran halaman PDF sama dengan ukuran halaman DOCX (±1 mm); dengan `-p`, ukuran pilihan yang dipakai dan margin tetap dari DOCX.
+- [x] **AC-2 (huruf):** Ukuran huruf isi PDF sama dengan ukuran huruf paragraf isi yang dominan di DOCX. Jenis huruf memakai font DOCX kalau terpasang, atau penggantinya yang setara (D-029) kalau tidak.
+- [x] **AC-3 (spasi):** Spasi baris 1; 1,5; dan 2 menghasilkan jarak antar-baseline 1,15 × kelipatan × ukuran huruf (±5%); spasi baris pasti (*exactly*) memakai nilai DOCX (±5%). Jarak sebelum/sesudah paragraf mengikuti DOCX.
+- [x] **AC-4 (perataan):** Paragraf isi yang rata kiri-kanan di DOCX tetap rata kiri-kanan di PDF; paragraf rata kiri (atau tanpa perataan) tetap rata kiri.
+- [x] **AC-5 (pemenggalan & nomor halaman):** Kata tidak dipenggal kecuali DOCX mengaktifkan pemenggalan otomatis. Nomor halaman hanya muncul kalau footer DOCX berisi nomor halaman, dan footer yang hanya berisi nomor halaman tidak lagi diperingatkan sebagai hilang.
+- [x] **AC-6 (font tidak ada):** Ketika font DOCX dan penggantinya tidak terpasang, maka konversi tetap berhasil dengan font bawaan, muncul peringatan yang menyebut nama font, dan exit code 0.
+- [x] **AC-7 (nilai tidak ada/tidak valid):** Ketika DOCX tidak menyebut margin, huruf, atau ukuran halaman, atau nilainya tidak masuk akal (mis. margin negatif atau lebih besar dari halaman), maka nilai itu memakai bawaan sebelumnya dan konversi tetap berhasil. DOCX rusak tetap gagal seperti REQ-005 AC-5.
+- [x] **AC-8:** MD/TXT → PDF tidak berubah (tetap A4 dan gaya bawaan).
+
+### Di luar REQ ini
+- Perataan dan ukuran huruf per paragraf, mis. judul yang ditengahkan langsung (D-031).
+- Gaya heading, indentasi baris pertama, header/footer selain nomor halaman, kolom, text box.
+- Membundel font.

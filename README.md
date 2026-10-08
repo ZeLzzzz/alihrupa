@@ -52,7 +52,7 @@ The last argument is the target format. Results go next to the original file, na
 | DOCX | PDF |
 | Markdown, TXT | DOCX, PDF |
 
-PDF results are A4 by default. Choose another paper size with `-p`/`--paper`: `a4`, `a5`, `a3`, `letter` (216×279 mm), `legal` (216×356 mm) or `f4` (215×330 mm, common in Indonesia). The option only applies when the target is `pdf`; using it with another target is an error and nothing is converted. Pages are always portrait.
+PDF results are A4 by default; from a DOCX they take the DOCX's page size. Choose another paper size with `-p`/`--paper`: `a4`, `a5`, `a3`, `letter` (216×279 mm), `legal` (216×356 mm) or `f4` (215×330 mm, common in Indonesia). The option only applies when the target is `pdf`; using it with another target is an error and nothing is converted. Pages are always portrait.
 
 The CLI messages are in Indonesian, because that is what the author uses.
 
@@ -64,7 +64,8 @@ Each successful conversion prints `source → result` on stdout. Errors and warn
 
 - **PDF → DOCX** works well for text-based PDFs. Complex layouts (columns, intricate tables) are not reproduced exactly.
 - **Scanned PDFs** have no text layer, so the DOCX contains images only. OCR is not supported; `alihrupa` warns when this happens.
-- **DOCX → PDF** rebuilds the document instead of rendering it like Word does. Text, headings, lists, tables and images are kept, but the result does not look identical. Headers, footers, text boxes and multi-column layouts are lost; `alihrupa` warns about each of them.
+- **DOCX → PDF** rebuilds the document instead of rendering it like Word does. Text, headings, lists, tables and images are kept, and the basic layout follows the DOCX: page size, margins, the font and size of the body text, line and paragraph spacing, justified or left alignment, hyphenation, and page numbers (only when the DOCX footer has them). It still does not look identical: alignment or font size set on a single paragraph (such as a centred title typed in Normal style) is not kept, and headers, footers, text boxes and multi-column layouts are lost; `alihrupa` warns about each of them.
+- **Fonts** are not bundled. A DOCX font that is not installed is replaced by a free font with the same metrics when one is installed (Times New Roman → Liberation Serif or Tinos, Arial → Liberation Sans or Arimo, Calibri → Carlito, Cambria → Caladea, Courier New → Liberation Mono or Cousine). Otherwise the default font is used and `alihrupa` warns. On Arch: `pacman -S ttf-liberation ttf-carlito ttf-caladea`; on Debian/Ubuntu: `apt install fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea`.
 - **Images referenced by URL** in Markdown or SVG are not downloaded. In Markdown they are replaced by their description; in SVG they are left out. Either way `alihrupa` warns.
 - Markdown and TXT files must be UTF-8.
 - Image conversion only changes the format: no resizing or quality settings. Transparent areas become white in JPG. EXIF metadata (including GPS location) is not copied; the photo's rotation is applied to the pixels instead.

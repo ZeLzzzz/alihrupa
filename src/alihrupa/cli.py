@@ -31,7 +31,7 @@ def publish(tmp: Path, dst: Path, force: bool) -> None:
         os.replace(tmp, dst)
 
 
-def convert_file(src: Path, target: str, target_ext: str, out_dir: Path | None, force: bool, paper: str = "a4") -> Path:
+def convert_file(src: Path, target: str, target_ext: str, out_dir: Path | None, force: bool, paper: str | None = None) -> Path:
     if not src.exists():
         raise ConvertError("file tidak ditemukan")
     if not src.is_file():
@@ -80,7 +80,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("-f", "--force", action="store_true", help="timpa file hasil yang sudah ada")
     p.add_argument(
         "-p", "--paper", metavar="UKURAN", type=str.lower,
-        help=f"ukuran kertas hasil PDF: {', '.join(PAPERS)} (bawaan: a4; f4 = 215×330 mm)",
+        help=f"ukuran kertas hasil PDF: {', '.join(PAPERS)} (bawaan: a4, atau ukuran halaman DOCX; f4 = 215×330 mm)",
     )
     p.add_argument("-V", "--version", action="version", version=f"alihrupa {__version__}")
     args = p.parse_args(argv)
@@ -102,7 +102,7 @@ def main(argv: list[str] | None = None) -> int:
     failed: list[tuple[Path, str]] = []
     for src in args.files:
         try:
-            dst = convert_file(src, target, target_ext, args.output, args.force, args.paper or "a4")
+            dst = convert_file(src, target, target_ext, args.output, args.force, args.paper)
         except ConvertError as e:
             failed.append((src, str(e)))
             print(f"alihrupa: {src}: {e}", file=sys.stderr)

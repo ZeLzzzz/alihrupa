@@ -40,6 +40,7 @@ W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
 
 def make_docx(path, header=None, footer=None, textbox=None):
     d = docx.Document()
+    d.styles["Normal"].font.name = "Libertinus Serif"  # bundled with Typst; Cambria would add a font warning
     d.add_heading("Dokumen Uji", 1)
     d.add_paragraph("Isi utama dokumen.")
     if header:
@@ -193,7 +194,7 @@ def test_empty_header_is_not_reported(tmp_path, capsys):
     )
     d.save(tmp_path / "header_kosong.docx")
     assert main([str(tmp_path / "header_kosong.docx"), "pdf"]) == 0
-    assert "peringatan" not in capsys.readouterr().err
+    assert "tidak ikut ke PDF" not in capsys.readouterr().err
 
 
 def test_columns_are_reported(tmp_path, capsys):
