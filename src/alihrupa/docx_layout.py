@@ -27,6 +27,13 @@ SUBSTITUTES = {
 }
 
 PAGE_FIELD = re.compile(r'(?:w:instr="\s*PAGE\b|<w:instrText[^>]*>\s*PAGE\b)')
+# A whole PAGE field with the number Word last showed: a simple field, or a complex one from its own "begin" to "end".
+PAGE_FIELD_WHOLE = re.compile(
+    r'<w:fldSimple\b[^>]*w:instr="\s*PAGE\b[^>]*[^/]>.*?</w:fldSimple>'
+    r'|<w:fldChar\b[^>]*w:fldCharType="begin"[^>]*/>(?:(?!w:fldCharType="begin").)*?<w:instrText[^>]*>\s*PAGE\b'
+    r'.*?<w:fldChar\b[^>]*w:fldCharType="end"[^>]*/>',
+    re.S,
+)
 
 
 @dataclass
@@ -74,11 +81,14 @@ def mm(tw: int) -> float:
 
 
 def page_number_only(xml: str) -> bool:
-    """A footer whose only text is a page number field (alihrupa renders that one itself)."""
+    """A footer whose only text is a page number field (alihrupa renders that one itself).
+
+    The number Word last showed (1, iv, B, …) sits inside the PAGE field; any other text, including what
+    other fields show (a chapter title from STYLEREF, a DATE), would be lost.
+    """
     if not PAGE_FIELD.search(xml):
         return False
-    text = "".join(re.findall(r"<w:t(?:\s[^>]*)?>([^<]*)</w:t>", xml))
-    return text.strip().isdigit() or not text.strip()
+    return not "".join(re.findall(r"<w:t(?:\s[^>]*)?>([^<]*)</w:t>", PAGE_FIELD_WHOLE.sub("", xml))).strip()
 
 
 class Styles:

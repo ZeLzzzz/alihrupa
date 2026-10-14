@@ -2,6 +2,8 @@
 
 import io
 import pathlib
+import re
+import zipfile
 
 import docx
 import pymupdf
@@ -125,6 +127,32 @@ def test_remote_images_not_downloaded(tmp_path, capsys, http_server, target):
 
 
 @pytest.mark.parametrize("target", ["docx", "pdf"])
+def test_html_images_not_downloaded_and_reported(tmp_path, capsys, http_server, target):
+    base, requests = http_server
+    source = tmp_path / "html.md"
+    source.write_text(f'Teks <img src="{base}/a.png" alt="ikon jauh"> lagi.\n\n<div><img src="{base}/b.png"></div>\n\n'
+                      f'Tanpa kutip <img data-src=x src={base}/c.png alt=polos> juga.\n')
+    assert main([str(source), target]) == 0
+    assert requests == []
+    assert "3 gambar dari URL tidak diunduh" in capsys.readouterr().err
+    if target == "pdf":
+        text = pdf_text(tmp_path / "html.pdf")
+        assert "ikon jauh" in text and "polos" in text
+
+
+@pytest.mark.parametrize("target", ["docx", "pdf"])
+def test_raw_typst_is_dropped(tmp_path, capsys, target):
+    """G-001: raw Typst can `#import "@preview/…"`, which makes Typst download the package (D-035)."""
+    source = tmp_path / "typst.md"
+    source.write_text('Awal.\n\n```{=typst}\n#text("BLOK-TYPST")\n```\n\nSebaris `#text("INLINE-TYPST")`{=typst} saja.\n')
+    assert main([str(source), target]) == 0
+    assert "2 blok Typst mentah dilewati" in capsys.readouterr().err
+    if target == "pdf":
+        text = pdf_text(tmp_path / "typst.pdf")
+        assert "Awal." in text and "TYPST" not in text
+
+
+@pytest.mark.parametrize("target", ["docx", "pdf"])
 def test_local_relative_image_included(tmp_path, target):
     (tmp_path / "gambar").mkdir()
     Image.new("RGB", (60, 30), (0, 200, 0)).save(tmp_path / "gambar" / "hijau.png")
@@ -183,6 +211,56 @@ def test_docx_rich_content_in_pdf(tmp_path):
         assert "Bold" in fonts["TEBAL"] and "Italic" in fonts["MIRING"]
         assert {"butir satu", "SEL-A", "SEL-D"} <= fonts.keys()
         assert len(page.get_images()) == 1
+
+
+def picture_docx(path, document_xml, rels_xml):
+    """A DOCX with one picture, whose document.xml and relationships are then rewritten."""
+    buf = io.BytesIO()
+    Image.new("RGB", (60, 30), (0, 200, 0)).save(buf, "PNG")
+    d = docx.Document()
+    d.styles["Normal"].font.name = "Libertinus Serif"
+    d.add_paragraph("Sebelum gambar.")
+    d.add_picture(buf)
+    embedded = io.BytesIO()
+    d.save(embedded)
+    with zipfile.ZipFile(embedded) as zin, zipfile.ZipFile(path, "w") as zout:
+        for item in zin.infolist():
+            data = zin.read(item.filename)
+            if item.filename == "word/document.xml":
+                data = document_xml(data)
+            elif item.filename == "word/_rels/document.xml.rels":
+                data = rels_xml(data)
+            zout.writestr(item, data)
+    return path
+
+
+def test_linked_image_is_reported(tmp_path, capsys, http_server):
+    """A picture the DOCX only links to (Word's "Link to File") is never fetched (G-001), so say it is missing."""
+    base, requests = http_server
+    source = picture_docx(
+        tmp_path / "tautan.docx",
+        lambda xml: xml.replace(b"r:embed=", b"r:link="),
+        lambda rels: re.sub(rb'Target="media/[^"]+"', f'Target="{base}/foto.png" TargetMode="External"'.encode(), rels),
+    )
+    assert main([str(source), "pdf"]) == 0
+    assert requests == []
+    assert "1 gambar yang hanya ditautkan" in capsys.readouterr().err
+    assert "Sebelum gambar." in pdf_text(tmp_path / "tautan.pdf")
+
+
+def test_inserted_and_linked_image_is_not_reported(tmp_path, capsys):
+    """Word's "Insert and Link" keeps a copy inside the DOCX next to the link, so the picture is in the PDF."""
+    source = picture_docx(
+        tmp_path / "salinan.docx",
+        lambda xml: re.sub(rb'r:embed="(rId\d+)"', rb'r:embed="\1" r:link="rIdLink1"', xml),
+        lambda rels: rels.replace(b"</Relationships>", b'<Relationship Id="rIdLink1" Type="http://schemas.openxmlformats.org/'
+                                  b'officeDocument/2006/relationships/image" Target="file:///C:/foto/asli.png" '
+                                  b'TargetMode="External"/></Relationships>'),
+    )
+    assert main([str(source), "pdf"]) == 0
+    assert "peringatan" not in capsys.readouterr().err
+    with pymupdf.open(tmp_path / "salinan.pdf") as doc:
+        assert len(doc[0].get_images()) == 1
 
 
 def test_empty_header_is_not_reported(tmp_path, capsys):

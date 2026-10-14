@@ -1,10 +1,11 @@
 """REQ-001: converting a single PNG/JPG/WEBP image."""
 
 import hashlib
+import io
 import itertools
 
 import pytest
-from PIL import Image
+from PIL import Image, ImageCms
 
 from alihrupa.cli import main
 
@@ -88,6 +89,29 @@ def test_exif_and_gps_are_not_copied(tmp_path, src, dst):
     with Image.open(tmp_path / f"foto.{dst}") as im:
         assert not im.getexif()
         assert not im.info.get("exif")
+
+
+@pytest.mark.parametrize("dst", ["jpg", "webp"])
+def test_icc_profile_is_kept(tmp_path, dst):
+    """D-023: the colour profile stays, so colours look the same."""
+    icc = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()
+    source = tmp_path / "warna.png"
+    Image.new("RGB", (20, 10), (200, 30, 30)).save(source, "PNG", icc_profile=icc)
+    assert main([str(source), dst]) == 0
+    with Image.open(tmp_path / f"warna.{dst}") as im:
+        assert im.info.get("icc_profile") == icc
+
+
+@pytest.mark.parametrize("dst", ["jpg", "webp"])
+def test_saved_with_quality_90(tmp_path, dst):
+    """D-023: Pillow's default quality (75) is often blurry."""
+    noise = Image.effect_noise((64, 64), 60).convert("RGB")
+    source = tmp_path / "foto.png"
+    noise.save(source, "PNG")
+    expected = io.BytesIO()
+    noise.save(expected, FORMATS[dst], quality=90)
+    assert main([str(source), dst]) == 0
+    assert (tmp_path / f"foto.{dst}").read_bytes() == expected.getvalue()
 
 
 def test_palette_png_with_transparency_to_jpg(tmp_path):

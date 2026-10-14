@@ -125,6 +125,15 @@ def test_paper_option_wins_but_margins_stay(tmp_path):
     assert mm(min(l[0] for l in lines(pdf))) == pytest.approx(40, abs=0.5)
 
 
+def test_landscape_docx_stays_landscape(tmp_path):
+    """D-036: the DOCX's orientation comes with its page size; sizes chosen with -p stay portrait."""
+    src = make_docx(tmp_path / "a.docx", page=(29.7, 21))
+    w, h = page_mm(convert(src))
+    assert w == pytest.approx(297, abs=1) and h == pytest.approx(210, abs=1)
+    w, h = page_mm(convert(src, "-p", "a4", "--force"))
+    assert w == pytest.approx(210, abs=1) and h == pytest.approx(297, abs=1)
+
+
 def test_no_blank_first_page_and_title_kept(tmp_path):
     src = make_docx(tmp_path / "a.docx", title="Judul Dokumen", margins=(2.54,) * 4)
     pdf = convert(src)
@@ -231,6 +240,53 @@ def test_page_number_from_footer_field(tmp_path, capsys):
 
 def test_footer_with_text_still_warned(tmp_path, capsys):
     convert(make_docx(tmp_path / "a.docx", footer="Rahasia perusahaan", page_field=True))
+    assert "tidak ikut ke PDF: footer" in capsys.readouterr().err
+
+
+def complex_field(instr, shown):
+    """A field the way Word writes it (e.g. Insert → Page Number): begin, instruction, separate, result, end."""
+    return [f'<w:r {W}><w:fldChar w:fldCharType="begin"/></w:r>',
+            f'<w:r {W}><w:instrText xml:space="preserve"> {instr} </w:instrText></w:r>',
+            f'<w:r {W}><w:fldChar w:fldCharType="separate"/></w:r>',
+            f'<w:r {W}><w:t>{shown}</w:t></w:r>',
+            f'<w:r {W}><w:fldChar w:fldCharType="end"/></w:r>']
+
+
+def complex_page_field(fmt, shown):
+    return complex_field(f"PAGE \\* {fmt}", shown)
+
+
+def add_to_footer(src, fragments):
+    d = docx.Document(src)
+    for xml in fragments:
+        d.sections[0].footer.paragraphs[0]._p.append(parse_xml(xml))
+    d.save(src)
+    return src
+
+
+@pytest.mark.parametrize("field", [
+    [f'<w:fldSimple {W} w:instr=" PAGE \\* roman "><w:r><w:t>iv</w:t></w:r></w:fldSimple>'],
+    [f'<w:fldSimple {W} w:instr=" PAGE \\* ALPHABETIC "><w:r><w:t>B</w:t></w:r></w:fldSimple>'],
+    complex_page_field("ROMAN", "II"),
+], ids=["roman", "letter", "complex-field"])
+def test_page_number_in_other_formats_not_warned(tmp_path, capsys, field):
+    """A footer holding only a roman or letter page number is still only a page number."""
+    pdf = convert(add_to_footer(make_docx(tmp_path / "a.docx", margins=(2.54,) * 4), field))
+    assert bottom_margin_text(pdf, 25.4) == ["1"]  # the number's own format and restarts come with REQ-012
+    assert "tidak ikut ke PDF" not in capsys.readouterr().err
+
+
+def test_text_beside_a_complex_page_field_still_warned(tmp_path, capsys):
+    convert(add_to_footer(make_docx(tmp_path / "a.docx", footer="Halaman "), complex_page_field("arabic", "1")))
+    assert "tidak ikut ke PDF: footer" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("other", [complex_field('STYLEREF "Heading 1"', "BAB I PENDAHULUAN"),
+                                   complex_field('DATE \\@ "d MMMM yyyy"', "14 Oktober 2026")],
+                         ids=["styleref", "date"])
+def test_other_field_beside_page_number_still_warned(tmp_path, capsys, other):
+    """Only the page number is rendered; a chapter title or date from another field would be lost silently."""
+    convert(add_to_footer(make_docx(tmp_path / "a.docx"), [*other, f'<w:r {W}><w:tab/></w:r>', *complex_page_field("arabic", "1")]))
     assert "tidak ikut ke PDF: footer" in capsys.readouterr().err
 
 

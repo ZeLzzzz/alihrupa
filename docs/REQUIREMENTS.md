@@ -111,7 +111,7 @@
 - [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa surat.docx pdf`, maka `surat.pdf` dibuat, berisi semua teks, heading, list, tabel sederhana, dan gambar dari DOCX dengan urutan yang benar.
 - [x] **AC-2:** Format teks dasar (tebal, miring, ukuran heading) dipertahankan. Tampilan tidak harus identik dengan Word (D-020).
 - [x] **AC-3:** Konversi berhasil di mesin tanpa LibreOffice/Word (G-004).
-- [x] **AC-4 (batasan):** Ketika DOCX berisi elemen yang tidak bisa disusun ulang (mis. text box, kolom, header/footer), maka konversi tetap selesai dan isi teksnya tidak hilang diam-diam. Jika elemen dilewati, muncul peringatan.
+- [x] **AC-4 (batasan):** Ketika DOCX berisi elemen yang tidak bisa disusun ulang (mis. text box, kolom, header/footer, gambar yang hanya ditautkan), maka konversi tetap selesai dan isi teksnya tidak hilang diam-diam. Jika elemen dilewati, muncul peringatan.
 - [x] **AC-5 (gagal):** Ketika DOCX rusak atau bukan DOCX valid, maka muncul pesan gagal yang menyebut nama file, tidak ada PDF yang tertinggal, dan exit code 1.
 
 ### Di luar REQ ini
@@ -125,7 +125,7 @@
 **Status:** done
 **Tujuan:** Pengguna bisa mengubah catatan Markdown atau teks biasa menjadi DOCX.
 **Bergantung pada:** REQ-001
-**Keputusan terkait:** D-006, D-019, D-024
+**Keputusan terkait:** D-006, D-019, D-024, D-035
 
 ### Acceptance criteria
 - [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa catatan.md docx`, maka `catatan.docx` dibuat, dan heading, paragraf, daftar (bullet/bernomor), teks tebal/miring, serta blok kode tampil dengan format yang sesuai.
@@ -134,6 +134,7 @@
 - [x] **AC-4 (input tidak valid):** Ketika file bukan UTF-8 yang valid, maka muncul pesan gagal yang jelas, dan tidak ada DOCX yang tertinggal.
 - [x] **AC-5 (kosong):** Ketika file kosong, maka DOCX kosong tetap dibuat dan konversi tidak crash.
 - [x] **AC-6:** Gambar di Markdown yang merujuk URL tidak diunduh (G-001); gambar lokal dengan path relatif disertakan jika ada.
+- [x] **AC-7 (Typst mentah):** Ketika Markdown berisi blok Typst mentah (`{=typst}`), maka blok itu tidak ikut ke DOCX, muncul peringatan, dan konversi tetap berhasil (D-035).
 
 ### Di luar REQ ini
 - Tabel Markdown kompleks dan ekstensi seperti matematika atau diagram.
@@ -145,13 +146,14 @@
 **Status:** done
 **Tujuan:** Pengguna bisa mengubah Markdown/TXT langsung ke PDF dengan satu perintah.
 **Bergantung pada:** REQ-001
-**Keputusan terkait:** D-019, D-020, D-024
+**Keputusan terkait:** D-019, D-020, D-024, D-035
 
 ### Acceptance criteria
 - [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa catatan.md pdf`, maka `catatan.pdf` dibuat, dan heading, paragraf, list, teks tebal/miring, serta blok kode tampil dengan format yang sesuai.
 - [x] **AC-2:** Konversi langsung dari Markdown/TXT, tanpa file DOCX perantara di folder pengguna (D-020).
 - [x] **AC-3:** Teks non-ASCII tampil benar. Aturan UTF-8, file kosong, dan gambar URL sama dengan REQ-006 AC-3 s.d. AC-6.
 - [x] **AC-4 (gagal):** Ketika konversi gagal, maka tidak ada PDF setengah jadi yang tertinggal, dan exit code 1.
+- [x] **AC-5 (Typst mentah):** Ketika Markdown berisi blok Typst mentah (`{=typst}`), maka blok itu tidak ikut ke hasil, muncul peringatan, konversi tetap berhasil, dan tidak ada yang diunduh (G-001, D-035).
 
 ### Di luar REQ ini
 - Tema/CSS khusus untuk PDF.
@@ -163,7 +165,7 @@
 **Status:** done
 **Tujuan:** Orang lain di Linux bisa memasang dan memakai `alihrupa` tanpa bertanya ke pemilik proyek.
 **Bergantung pada:** REQ-001
-**Keputusan terkait:** D-001, D-002, D-015, D-017, D-018, D-020
+**Keputusan terkait:** D-001, D-002, D-015, D-017, D-018, D-020, D-026
 
 ### Acceptance criteria
 - [x] **AC-1 (alur utama):** Di mesin Linux yang bersih dengan `uv`, `uv tool install <sumber>` memasang perintah `alihrupa`, dan `alihrupa --help` berjalan.
@@ -182,12 +184,12 @@
 **Status:** done
 **Tujuan:** Pengguna bisa memilih ukuran kertas PDF hasil konversi, sehingga dokumen bisa langsung dicetak di kertas F4, Letter, dan lainnya, bukan hanya A4.
 **Bergantung pada:** REQ-005, REQ-007
-**Keputusan terkait:** D-027, D-028
+**Keputusan terkait:** D-027, D-028, D-030
 
 ### Acceptance criteria
 - [x] **AC-1 (alur utama):** Ketika menjalankan `alihrupa laporan.docx pdf -p f4`, maka setiap halaman `laporan.pdf` berukuran 215×330 mm. Berlaku juga untuk sumber Markdown dan TXT.
 - [x] **AC-2:** `a4`, `a5`, `a3`, `letter`, dan `legal` masing-masing menghasilkan 210×297, 148×210, 297×420, 216×279, dan 216×356 mm. Bentuk panjang `--paper` dan huruf besar (`-p F4`) juga diterima.
-- [x] **AC-3:** Tanpa `-p`, PDF tetap A4 seperti sebelumnya.
+- [x] **AC-3:** Tanpa `-p`, PDF tetap A4 seperti sebelumnya. Sumber DOCX memakai ukuran halaman DOCX (D-030, REQ-010 AC-1).
 - [x] **AC-4 (input tidak valid):** Ketika ukurannya tidak dikenal (`-p b5`), maka muncul pesan yang menyebut ukuran yang tersedia, exit code 2, dan tidak ada file yang dibuat.
 - [x] **AC-5 (input tidak valid):** Ketika `-p` dipakai dengan tujuan selain PDF (`alihrupa foto.png jpg -p f4`), maka muncul pesan bahwa `--paper` hanya untuk hasil PDF, exit code 2, dan tidak ada file yang dibuat.
 - [x] **AC-6:** `alihrupa --help` mencantumkan opsi `-p/--paper` beserta daftar ukurannya; README menjelaskannya.
@@ -203,10 +205,10 @@
 **Status:** done
 **Tujuan:** PDF dari DOCX memakai margin, huruf, spasi, dan perataan yang sama dengan dokumen aslinya, sehingga hasilnya tidak terasa seperti dokumen lain.
 **Bergantung pada:** REQ-005, REQ-009
-**Keputusan terkait:** D-020, D-029, D-030, D-031
+**Keputusan terkait:** D-020, D-029, D-030, D-031, D-036
 
 ### Acceptance criteria
-- [x] **AC-1 (margin & kertas):** Margin tiap sisi PDF sama dengan margin DOCX (±0,5 mm). Tanpa `-p`, ukuran halaman PDF sama dengan ukuran halaman DOCX (±1 mm); dengan `-p`, ukuran pilihan yang dipakai dan margin tetap dari DOCX.
+- [x] **AC-1 (margin & kertas):** Margin tiap sisi PDF sama dengan margin DOCX (±0,5 mm). Tanpa `-p`, ukuran halaman PDF sama dengan ukuran halaman DOCX (±1 mm), termasuk orientasinya (D-036); dengan `-p`, ukuran pilihan yang dipakai dan margin tetap dari DOCX.
 - [x] **AC-2 (huruf):** Ukuran huruf isi PDF sama dengan ukuran huruf paragraf isi yang dominan di DOCX. Jenis huruf memakai font DOCX kalau terpasang, atau penggantinya yang setara (D-029) kalau tidak.
 - [x] **AC-3 (spasi):** Spasi baris 1; 1,5; dan 2 menghasilkan jarak antar-baseline 1,15 × kelipatan × ukuran huruf (±5%); spasi baris pasti (*exactly*) memakai nilai DOCX (±5%). Jarak sebelum/sesudah paragraf mengikuti DOCX.
 - [x] **AC-4 (perataan):** Paragraf isi yang rata kiri-kanan di DOCX tetap rata kiri-kanan di PDF; paragraf rata kiri (atau tanpa perataan) tetap rata kiri.
@@ -251,7 +253,7 @@
 **Status:** ready
 **Tujuan:** Nomor halaman di PDF sama dengan di DOCX (halaman depan romawi, isi mulai dari 1, sampul tanpa nomor), sehingga daftar isi dan rujukan halaman tetap cocok.
 **Bergantung pada:** REQ-010
-**Keputusan terkait:** D-029, D-033, D-034
+**Keputusan terkait:** D-029, D-033, D-034, D-037
 
 ### Acceptance criteria
 - [ ] **AC-1 (format dan mulai ulang):** DOCX dengan dua section, yang pertama berformat romawi kecil mulai dari 1 dan yang kedua berformat angka mulai dari 1, menghasilkan PDF bernomor i, ii, iii, … lalu 1, 2, 3, …. Tiap section yang dimulai di halaman baru memulai halaman baru; format huruf (a, A) dan romawi besar (I) juga didukung.
@@ -260,7 +262,7 @@
 - [ ] **AC-4 (perataan):** Nomor halaman rata kiri, tengah, atau kanan sesuai paragraf footer di DOCX; tanpa perataan, rata kiri.
 - [ ] **AC-5 (warisan footer):** Section yang tidak menulis footer sendiri memakai footer section sebelumnya (nomornya tetap tampil). Section yang footernya tidak berisi nomor halaman tidak bernomor.
 - [ ] **AC-6 (continuous):** Section `continuous` tidak memulai halaman baru dan tidak mengubah penomoran.
-- [ ] **AC-7 (nilai tidak valid, gagal sebagian):** Ketika nilai mulai tidak masuk akal (negatif, nol, atau di atas 9999), format tidak dikenal, atau footer menunjuk bagian yang tidak ada, maka nilai itu diabaikan (lanjut/angka/tanpa nomor) dan konversi tetap berhasil. Ketika batas section tidak bisa diterapkan, konversi tetap berhasil dengan satu urutan nomor seperti sebelumnya dan muncul peringatan.
+- [ ] **AC-7 (nilai tidak valid, gagal sebagian):** Nilai mulai 0 diterima, sehingga halaman berikutnya bernomor 1 (D-037). Ketika nilai mulai tidak masuk akal (negatif atau di atas 9999), format tidak dikenal, atau footer menunjuk bagian yang tidak ada, maka nilai itu diabaikan (lanjut/angka/tanpa nomor) dan konversi tetap berhasil. Ketika batas section tidak bisa diterapkan, konversi tetap berhasil dengan satu urutan nomor seperti sebelumnya dan muncul peringatan.
 - [ ] **AC-8 (tidak berubah):** DOCX satu section tanpa nomor di footer tetap tanpa nomor; MD/TXT → PDF tidak berubah.
 
 ### Di luar REQ ini
@@ -268,3 +270,15 @@
 - Ukuran halaman, margin, dan orientasi per section (tetap dari section terakhir).
 - Memperbarui nomor halaman yang tersimpan di daftar isi Word.
 - Tabel dan format langsung per paragraf (D-033).
+
+---
+
+## Backlog
+
+| Urutan | Fitur | Dicatat | Catatan |
+|---|---|---|---|
+| 1 | DOCX → PDF mengikuti gaya tabel | User / 2026-10-08 | Urutan D-033, setelah REQ-012 |
+| 2 | DOCX → PDF mengikuti format langsung per paragraf (perataan dan ukuran huruf, mis. judul yang ditengahkan di paragraf Normal) | User / 2026-10-08 | D-031, D-033; butuh membaca format tiap paragraf dari XML DOCX sendiri |
+| — | Orientasi landscape lewat `-p` dan untuk MD/TXT → PDF | User / 2026-10-08 | D-028; DOCX landscape sudah tetap landscape (D-036) |
+| — | OCR untuk PDF hasil scan | User / 2026-10-07 | D-013 |
+| — | Edit PDF: merge, split, kompres | User / 2026-10-07 | D-013; bukan konversi format |

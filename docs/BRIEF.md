@@ -17,7 +17,7 @@ Mengonversi file antarformat (PDF ↔ DOCX, PNG ↔ JPG, dan lainnya) biasanya d
 - Dokumen: PDF → DOCX, DOCX → PDF, Markdown/TXT → DOCX, dan Markdown/TXT → PDF.
 - Hasil di samping file asli atau di folder `-o`; tidak menimpa tanpa `--force`.
 - Batch tetap berjalan meski ada file yang gagal, dengan ringkasan dan exit code.
-- Ukuran kertas hasil PDF bisa dipilih dengan `-p/--paper` (A4, A5, A3, Letter, Legal, F4); bawaan A4, atau ukuran halaman DOCX untuk sumber DOCX (D-027, D-030).
+- Ukuran kertas hasil PDF bisa dipilih dengan `-p/--paper` (A4, A5, A3, Letter, Legal, F4); bawaan A4, atau ukuran dan orientasi halaman DOCX untuk sumber DOCX (D-027, D-030, D-036).
 - DOCX → PDF mengikuti tata letak dasar DOCX: margin, huruf, spasi, perataan isi, pemenggalan, nomor halaman (D-029), serta gaya heading dan indentasi baris pertama (D-032) dan nomor halaman per section (D-034).
 - Tanpa aplikasi office: DOCX → PDF dan Markdown/TXT → PDF memakai mesin ringan yang menyusun ulang isi dokumen (D-020).
 - Instalasi yang bisa diikuti orang lain dan README.
@@ -25,14 +25,12 @@ Mengonversi file antarformat (PDF ↔ DOCX, PNG ↔ JPG, dan lainnya) biasanya d
 ## Di luar scope
 - Audio/video (walau `ffmpeg` tersedia).
 - GUI atau antarmuka web.
-- OCR untuk PDF hasil scan (ditunda).
-- Edit PDF: merge, split, kompres (ditunda).
 - Opsi gambar selain ganti format (kualitas, resize).
-- Orientasi landscape untuk PDF (fitur mendatang, D-028).
-- Perataan dan ukuran huruf per paragraf dari DOCX, mis. judul yang ditengahkan langsung (fitur mendatang, D-031).
 - Dukungan resmi Windows/macOS (nice-to-have, bukan v1).
 - Layanan atau API online apa pun.
 - Ketergantungan pada LibreOffice, Microsoft Word, atau aplikasi office lain (D-020).
+
+Fitur yang ditunda (OCR, edit PDF, landscape lewat `-p`, tabel, format per paragraf) ada di Backlog `docs/REQUIREMENTS.md`.
 
 ## Batasan
 - Berjalan sepenuhnya offline.

@@ -13,6 +13,7 @@ from alihrupa.errors import ConvertError, warn
 
 NO_REMOTE = Path(__file__).with_name("no_remote.lua")
 REMOTE_MARKER = "alihrupa-remote-image\t"
+RAW_TYPST_MARKER = "alihrupa-raw-typst"
 
 # Typst paper names per paper size (D-027). F4 has no Typst preset: it starts as A4 and gets its real size in to_pdf.
 PAPERS = {"a4": "a4", "a5": "a5", "a3": "a3", "letter": "us-letter", "legal": "us-legal", "f4": "a4"}
@@ -61,6 +62,9 @@ def pandoc(src: Path, args: list[str], cwd: Path | None = None) -> None:
     remote = [line for line in result.stderr.splitlines() if line.startswith(REMOTE_MARKER)]
     if remote:
         warn(src, f"{len(remote)} gambar dari URL tidak diunduh dan diganti keterangannya")
+    raw_typst = result.stderr.splitlines().count(RAW_TYPST_MARKER)
+    if raw_typst:
+        warn(src, f"{raw_typst} blok Typst mentah dilewati (bisa mengunduh dari internet, lihat G-001)")
 
 
 def has_text(xml: str) -> bool:
@@ -87,6 +91,18 @@ def lost_docx_parts(src: Path) -> list[str]:
     if re.search(r'<w:cols\b[^>]*w:num="([2-9]|\d\d)"', body):
         lost.append("tata letak kolom")
     return lost
+
+
+def linked_images(z: zipfile.ZipFile) -> int:
+    """Pictures the DOCX only links to (Word's "Link to File"): pandoc drops them, and alihrupa never fetches them (G-001).
+
+    "Insert and Link" also keeps a copy inside the DOCX (r:embed next to r:link), which pandoc does show.
+    """
+    try:
+        body = z.read("word/document.xml").decode("utf-8", "replace")
+    except KeyError:
+        return 0
+    return sum(1 for blip in re.findall(r"<a:blip\b[^>]*>", body) if "r:link=" in blip and "r:embed=" not in blip)
 
 
 def to_docx(src: Path, dst: Path, fmt: str) -> None:
@@ -222,11 +238,13 @@ def to_pdf(src: Path, dst: Path, fmt: str, paper: str | None = None) -> None:
 
     is_docx = src.suffix.lower() == ".docx"
     lost = lost_docx_parts(src) if is_docx else []
+    linked = 0
     with tempfile.TemporaryDirectory(prefix="alihrupa-") as tmp:
         work = Path(tmp)
         if is_docx:
             with zipfile.ZipFile(src) as z:
                 layout = read_layout(z)
+                linked = linked_images(z)
             font = pick_font(layout.font) if layout.font else None
             if layout.font and not font:
                 warn(src, f"font {layout.font} tidak terpasang (begitu juga penggantinya), memakai font bawaan")
@@ -256,3 +274,5 @@ def to_pdf(src: Path, dst: Path, fmt: str, paper: str | None = None) -> None:
     dst.write_bytes(pdf)
     if lost:
         warn(src, f"tidak ikut ke PDF: {', '.join(lost)} (tata letak disusun ulang, lihat D-020)")
+    if linked:
+        warn(src, f"{linked} gambar yang hanya ditautkan (tidak tersimpan di DOCX) tidak ikut ke PDF")
