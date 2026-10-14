@@ -15,6 +15,7 @@
 | REQ-009 | Memilih ukuran kertas hasil PDF dengan `-p/--paper` | done | REQ-005, REQ-007 |
 | REQ-010 | DOCX → PDF mengikuti tata letak dasar DOCX | done | REQ-005, REQ-009 |
 | REQ-011 | DOCX → PDF mengikuti gaya heading dan indentasi baris pertama | done | REQ-010 |
+| REQ-012 | DOCX → PDF mengikuti section dan nomor halaman per section | ready | REQ-010 |
 
 ---
 
@@ -242,3 +243,28 @@
 - Section dan nomor halaman (romawi, penomoran ulang, tanpa nomor di sampul), tabel, dan format langsung per paragraf (D-033, D-031).
 - Penomoran heading otomatis dari daftar bertingkat Word, gaya Title/Subtitle, hanging indent (mis. daftar pustaka), blok kutipan, dan daftar isi.
 - Membundel font.
+
+---
+
+## REQ-012 — DOCX → PDF mengikuti section dan nomor halaman per section
+
+**Status:** ready
+**Tujuan:** Nomor halaman di PDF sama dengan di DOCX (halaman depan romawi, isi mulai dari 1, sampul tanpa nomor), sehingga daftar isi dan rujukan halaman tetap cocok.
+**Bergantung pada:** REQ-010
+**Keputusan terkait:** D-029, D-033, D-034
+
+### Acceptance criteria
+- [ ] **AC-1 (format dan mulai ulang):** DOCX dengan dua section, yang pertama berformat romawi kecil mulai dari 1 dan yang kedua berformat angka mulai dari 1, menghasilkan PDF bernomor i, ii, iii, … lalu 1, 2, 3, …. Tiap section yang dimulai di halaman baru memulai halaman baru; format huruf (a, A) dan romawi besar (I) juga didukung.
+- [ ] **AC-2 (halaman pertama):** Section yang memakai "halaman pertama berbeda" dan tidak punya nomor di footer halaman pertama, tidak menampilkan nomor di halaman pertamanya, tetapi halaman itu tetap dihitung (halaman berikutnya bernomor ii).
+- [ ] **AC-3 (lanjut):** Section tanpa nilai mulai melanjutkan hitungan section sebelumnya, dengan format barunya.
+- [ ] **AC-4 (perataan):** Nomor halaman rata kiri, tengah, atau kanan sesuai paragraf footer di DOCX; tanpa perataan, rata kiri.
+- [ ] **AC-5 (warisan footer):** Section yang tidak menulis footer sendiri memakai footer section sebelumnya (nomornya tetap tampil). Section yang footernya tidak berisi nomor halaman tidak bernomor.
+- [ ] **AC-6 (continuous):** Section `continuous` tidak memulai halaman baru dan tidak mengubah penomoran.
+- [ ] **AC-7 (nilai tidak valid, gagal sebagian):** Ketika nilai mulai tidak masuk akal (negatif, nol, atau di atas 9999), format tidak dikenal, atau footer menunjuk bagian yang tidak ada, maka nilai itu diabaikan (lanjut/angka/tanpa nomor) dan konversi tetap berhasil. Ketika batas section tidak bisa diterapkan, konversi tetap berhasil dengan satu urutan nomor seperti sebelumnya dan muncul peringatan.
+- [ ] **AC-8 (tidak berubah):** DOCX satu section tanpa nomor di footer tetap tanpa nomor; MD/TXT → PDF tidak berubah.
+
+### Di luar REQ ini
+- Isi footer dan header selain nomor halaman (mis. "Halaman 1 dari 5") dan footer genap/ganjil berbeda.
+- Ukuran halaman, margin, dan orientasi per section (tetap dari section terakhir).
+- Memperbarui nomor halaman yang tersimpan di daftar isi Word.
+- Tabel dan format langsung per paragraf (D-033).
