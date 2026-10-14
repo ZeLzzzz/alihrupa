@@ -6,4 +6,9 @@ def warn(src, message: str) -> None:
     """A conversion succeeded, but the user should know about a limitation of the result."""
     import sys
 
-    print(f"alihrupa: {src}: peringatan: {message}", file=sys.stderr)
+    print(f"alihrupa: {src}: warning: {message}", file=sys.stderr)
+
+
+def plural(n: int, noun: str) -> str:
+    """"1 image", "2 images"."""
+    return f"{n} {noun}" if n == 1 else f"{n} {noun}s"

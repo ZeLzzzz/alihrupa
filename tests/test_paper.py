@@ -100,7 +100,7 @@ def test_paper_without_pdf_target(tmp_path, capsys):
     with pytest.raises(SystemExit) as e:
         main([str(src), "jpg", "-p", "f4"])
     assert e.value.code == 2
-    assert "hanya untuk hasil PDF" in capsys.readouterr().err
+    assert "only applies to PDF results" in capsys.readouterr().err
     assert sorted(p.name for p in tmp_path.iterdir()) == ["foto.png"]
 
 

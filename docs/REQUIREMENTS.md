@@ -16,6 +16,7 @@
 | REQ-010 | DOCX → PDF mengikuti tata letak dasar DOCX | done | REQ-005, REQ-009 |
 | REQ-011 | DOCX → PDF mengikuti gaya heading dan indentasi baris pertama | done | REQ-010 |
 | REQ-012 | DOCX → PDF mengikuti section dan nomor halaman per section | ready | REQ-010 |
+| REQ-013 | Pesan terminal berbahasa Inggris | done | REQ-002 |
 
 ---
 
@@ -270,6 +271,28 @@
 - Ukuran halaman, margin, dan orientasi per section (tetap dari section terakhir).
 - Memperbarui nomor halaman yang tersimpan di daftar isi Word.
 - Tabel dan format langsung per paragraf (D-033).
+
+
+---
+
+## REQ-013 — Pesan terminal berbahasa Inggris
+
+**Status:** done
+**Tujuan:** Pengguna di luar Indonesia memahami semua pesan alihrupa.
+**Bergantung pada:** REQ-002
+**Keputusan terkait:** D-001, D-039, D-040
+
+### Acceptance criteria
+- [x] **AC-1 (alur utama):** Semua error, peringatan, ringkasan batch, pesan pembatalan, dan teks `--help` berbahasa Inggris, termasuk saat konversi gagal (mis. file tidak ditemukan, file hasil sudah ada).
+- [x] **AC-2 (input tidak valid):** Ketika argumen tidak valid (mis. `-p b5`, atau `-p` dengan tujuan selain PDF), maka pesan errornya berbahasa Inggris dan exit code tetap 2.
+- [x] **AC-3 (bahasa sistem diabaikan):** Ketika bahasa sistem Indonesia (`LANG=id_ID.UTF-8`, `LANGUAGE=id`) atau aneh (`LANG=C`, tidak diatur), maka pesannya tetap berbahasa Inggris.
+- [x] **AC-4 (isi sama):** Setiap pesan memuat informasi yang sama dengan sebelumnya (nama file, jumlah, format, alasan dari library), dan tidak ada kata berbahasa Indonesia yang tersisa di pesan.
+- [x] **AC-5 (tidak berubah):** Baris hasil `sumber → hasil` di stdout dan exit code (0, 1, 2, 130) tidak berubah, sehingga skrip dan agent yang membaca hasilnya tidak perlu diubah.
+- [x] **AC-6 (tanpa ID internal):** Pesan tidak lagi menyebut ID internal spec seperti `D-020` atau `G-001`; alasannya ditulis singkat dalam kalimat (mis. "the document is rebuilt, not rendered like Word").
+
+### Di luar REQ ini
+- Pilihan bahasa lain (opsi `--lang`, mengikuti bahasa sistem).
+- Dokumen spec (`docs/`) dan catatan Obsidian tetap berbahasa Indonesia; README sudah berbahasa Inggris.
 
 ---
 

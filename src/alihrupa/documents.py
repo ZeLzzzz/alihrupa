@@ -9,7 +9,7 @@ import zipfile
 from pathlib import Path
 
 from alihrupa.docx_layout import SUBSTITUTES, Heading, Layout, page_number_only, read_layout
-from alihrupa.errors import ConvertError, warn
+from alihrupa.errors import ConvertError, plural, warn
 
 NO_REMOTE = Path(__file__).with_name("no_remote.lua")
 REMOTE_MARKER = "alihrupa-remote-image\t"
@@ -31,7 +31,7 @@ def read_text(src: Path) -> str:
     try:
         return src.read_text(encoding="utf-8-sig")
     except UnicodeDecodeError:
-        raise ConvertError("file bukan teks UTF-8 yang valid") from None
+        raise ConvertError("the file is not valid UTF-8 text") from None
 
 
 def txt_as_html(text: str) -> str:
@@ -58,13 +58,13 @@ def pandoc(src: Path, args: list[str], cwd: Path | None = None) -> None:
     )
     if result.returncode != 0:
         reason = (result.stderr.strip().splitlines() or [f"pandoc exit {result.returncode}"])[-1]
-        raise ConvertError(f"gagal membaca dokumen ({reason})")
+        raise ConvertError(f"could not read the document ({reason})")
     remote = [line for line in result.stderr.splitlines() if line.startswith(REMOTE_MARKER)]
     if remote:
-        warn(src, f"{len(remote)} gambar dari URL tidak diunduh dan diganti keterangannya")
+        warn(src, f"did not download {plural(len(remote), 'image')} referenced by URL; the description is shown instead")
     raw_typst = result.stderr.splitlines().count(RAW_TYPST_MARKER)
     if raw_typst:
-        warn(src, f"{raw_typst} blok Typst mentah dilewati (bisa mengunduh dari internet, lihat G-001)")
+        warn(src, f"skipped {plural(raw_typst, 'raw Typst block')}: Typst could download from the internet")
 
 
 def has_text(xml: str) -> bool:
@@ -80,7 +80,7 @@ def lost_docx_parts(src: Path) -> list[str]:
             body = z.read("word/document.xml").decode("utf-8", "replace")
             extra = {n: z.read(n).decode("utf-8", "replace") for n in names if re.match(r"word/(header|footer)\d*\.xml$", n)}
     except (zipfile.BadZipFile, KeyError):
-        raise ConvertError("bukan file DOCX yang valid") from None
+        raise ConvertError("not a valid DOCX file") from None
     lost = []
     if any(has_text(xml) for name, xml in extra.items() if "header" in name):
         lost.append("header")
@@ -89,7 +89,7 @@ def lost_docx_parts(src: Path) -> list[str]:
     if "txbxContent" in body:
         lost.append("text box")
     if re.search(r'<w:cols\b[^>]*w:num="([2-9]|\d\d)"', body):
-        lost.append("tata letak kolom")
+        lost.append("column layout")
     return lost
 
 
@@ -118,7 +118,7 @@ def set_f4(typ: Path) -> None:
     source = typ.read_text(encoding="utf-8")
     patched = source.replace("paper: paper,", F4_PAGE, 1)
     if patched == source:
-        raise ConvertError("ukuran kertas F4 tidak bisa diatur dengan versi pandoc ini")
+        raise ConvertError("the F4 paper size cannot be set with this pandoc version")
     typ.write_text(patched, encoding="utf-8")
 
 
@@ -230,7 +230,7 @@ def docx_conf(layout: Layout, paper: str | None, font: str | None) -> str:
 def check_conf(typ: Path) -> None:
     """Make sure pandoc's template still lays out the body through `conf`, which docx_conf replaces."""
     if "#show: doc => conf(" not in typ.read_text(encoding="utf-8"):
-        raise ConvertError("tata letak DOCX tidak bisa diterapkan dengan versi pandoc ini")
+        raise ConvertError("the DOCX layout cannot be applied with this pandoc version")
 
 
 def to_pdf(src: Path, dst: Path, fmt: str, paper: str | None = None) -> None:
@@ -247,14 +247,14 @@ def to_pdf(src: Path, dst: Path, fmt: str, paper: str | None = None) -> None:
                 linked = linked_images(z)
             font = pick_font(layout.font) if layout.font else None
             if layout.font and not font:
-                warn(src, f"font {layout.font} tidak terpasang (begitu juga penggantinya), memakai font bawaan")
+                warn(src, f"font {layout.font} is not installed (nor a substitute); using the default font")
             missing = {layout.font} if layout.font and not font else set()
             for h in layout.headings.values():
                 if not h.font:
                     continue
                 picked = pick_font(h.font)
                 if not picked and h.font not in missing:
-                    warn(src, f"font {h.font} (heading) tidak terpasang (begitu juga penggantinya), memakai font isi")
+                    warn(src, f"font {h.font} (heading) is not installed (nor a substitute); using the body font")
                     missing.add(h.font)
                 h.font = picked
             (work / "conf.typ").write_text(docx_conf(layout, paper, font), encoding="utf-8")
@@ -270,9 +270,9 @@ def to_pdf(src: Path, dst: Path, fmt: str, paper: str | None = None) -> None:
         try:
             pdf = typst.compile(str(work / "doc.typ"), root=str(work))
         except Exception as e:  # noqa: BLE001 - typst raises its own error types; show the message
-            raise ConvertError(f"gagal membuat PDF ({e})") from None
+            raise ConvertError(f"could not create the PDF ({e})") from None
     dst.write_bytes(pdf)
     if lost:
-        warn(src, f"tidak ikut ke PDF: {', '.join(lost)} (tata letak disusun ulang, lihat D-020)")
+        warn(src, f"left out of the PDF: {', '.join(lost)} (the document is rebuilt, not rendered like Word)")
     if linked:
-        warn(src, f"{linked} gambar yang hanya ditautkan (tidak tersimpan di DOCX) tidak ikut ke PDF")
+        warn(src, f"left out {plural(linked, 'picture')} the DOCX only links to (not stored in the file)")

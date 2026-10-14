@@ -123,14 +123,14 @@ def test_palette_png_with_transparency_to_jpg(tmp_path):
 def test_unsupported_pair(tmp_path, capsys):
     source = make_image(tmp_path / "foto.png")
     assert main([str(source), "mp3"]) == 1
-    assert "png → mp3 tidak didukung" in capsys.readouterr().err
+    assert "png → mp3 is not supported" in capsys.readouterr().err
     assert sorted(p.name for p in tmp_path.iterdir()) == ["foto.png"]
 
 
 def test_missing_file(tmp_path, capsys):
     assert main([str(tmp_path / "tidak-ada.png"), "jpg"]) == 1
     err = capsys.readouterr().err
-    assert "tidak-ada.png" in err and "tidak ditemukan" in err
+    assert "tidak-ada.png" in err and "not found" in err
 
 
 def test_not_an_image(tmp_path, capsys):
@@ -152,7 +152,7 @@ def test_same_format_does_nothing(tmp_path, capsys):
     source = make_image(tmp_path / "foto.png")
     before = checksum(source)
     assert main([str(source), "png"]) == 1
-    assert "sudah dalam format png" in capsys.readouterr().err
+    assert "already in png format" in capsys.readouterr().err
     assert checksum(source) == before
 
 
@@ -161,14 +161,14 @@ def test_existing_destination_not_overwritten(tmp_path, capsys):
     existing = tmp_path / "foto.jpg"
     existing.write_bytes(b"punya pengguna")
     assert main([str(source), "jpg"]) == 1
-    assert "sudah ada" in capsys.readouterr().err
+    assert "already exists" in capsys.readouterr().err
     assert existing.read_bytes() == b"punya pengguna"  # G-002
 
 
 def test_no_extension(tmp_path, capsys):
     source = make_image(tmp_path / "foto")
     assert main([str(source), "jpg"]) == 1
-    assert "tidak dikenali" in capsys.readouterr().err
+    assert "unknown source format" in capsys.readouterr().err
 
 
 def test_help_lists_formats(capsys):

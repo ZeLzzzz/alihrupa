@@ -150,7 +150,7 @@ def test_heading_font_installed(tmp_path):
 def test_heading_font_missing_warns_and_uses_body_font(tmp_path, capsys):
     pdf = convert(build(tmp_path / "a.docx", [("h1", "Judul"), ("p", BODY)], styles={1: dict(font="Font Heading Hilang")}))
     err = capsys.readouterr().err
-    assert "Font Heading Hilang" in err and "peringatan" in err
+    assert "Font Heading Hilang" in err and "warning" in err
     assert "Libertinus" in line_of(pdf, "Judul")[5]
 
 

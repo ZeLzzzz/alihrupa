@@ -12,7 +12,7 @@ from alihrupa.converters import CONVERTERS, normalize, supported_table
 from alihrupa.documents import PAPERS
 from alihrupa.errors import ConvertError
 
-EXISTS = "{dst} sudah ada, tidak ditimpa (pakai --force untuk menimpa)"
+EXISTS = "{dst} already exists, not overwritten (use --force to overwrite it)"
 
 
 def publish(tmp: Path, dst: Path, force: bool) -> None:
@@ -33,17 +33,17 @@ def publish(tmp: Path, dst: Path, force: bool) -> None:
 
 def convert_file(src: Path, target: str, target_ext: str, out_dir: Path | None, force: bool, paper: str | None = None) -> Path:
     if not src.exists():
-        raise ConvertError("file tidak ditemukan")
+        raise ConvertError("file not found")
     if not src.is_file():
-        raise ConvertError("bukan file")
+        raise ConvertError("not a file")
     source = normalize(src.suffix)
     if not source:
-        raise ConvertError("format sumber tidak dikenali (file tidak punya ekstensi)")
+        raise ConvertError("unknown source format (the file has no extension)")
     if source == target:
-        raise ConvertError(f"file sudah dalam format {target}, tidak ada yang diubah")
+        raise ConvertError(f"the file is already in {target} format, nothing changed")
     converter = CONVERTERS.get((source, target))
     if converter is None:
-        raise ConvertError(f"konversi {source} → {target} tidak didukung (lihat alihrupa --help)")
+        raise ConvertError(f"converting {source} → {target} is not supported (see alihrupa --help)")
     if target == "pdf":
         converter = functools.partial(converter, paper=paper)
 
@@ -54,14 +54,14 @@ def convert_file(src: Path, target: str, target_ext: str, out_dir: Path | None, 
     try:
         fd, name = tempfile.mkstemp(dir=dst.parent, prefix=f".{dst.stem}.", suffix=".alihrupa-tmp")
     except OSError as e:
-        raise ConvertError(f"tidak bisa menulis ke {dst.parent} ({e})") from None
+        raise ConvertError(f"cannot write to {dst.parent} ({e})") from None
     os.close(fd)
     tmp = Path(name)
     try:
         converter(src, tmp, target)
         publish(tmp, dst, force)
     except OSError as e:
-        raise ConvertError(f"gagal menyimpan {dst} ({e})") from None
+        raise ConvertError(f"could not save {dst} ({e})") from None
     finally:
         tmp.unlink(missing_ok=True)
     return dst
@@ -70,17 +70,17 @@ def convert_file(src: Path, target: str, target_ext: str, out_dir: Path | None, 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
         prog="alihrupa",
-        description="Konversi file antarformat secara lokal. File tidak pernah keluar dari komputer ini.",
-        epilog=f"contoh:\n  alihrupa foto.png jpg\n  alihrupa *.webp png -o hasil/\n  alihrupa laporan.docx pdf -p f4\n\nkonversi yang didukung:\n{supported_table()}",
+        description="Convert files between formats locally. Files never leave this computer.",
+        epilog=f"examples:\n  alihrupa photo.png jpg\n  alihrupa *.webp png -o results/\n  alihrupa report.docx pdf -p f4\n\nsupported conversions:\n{supported_table()}",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    p.add_argument("files", nargs="+", type=Path, help="file yang akan dikonversi")
-    p.add_argument("format", help="format tujuan, mis. jpg, png, webp")
-    p.add_argument("-o", "--output", type=Path, help="folder hasil (bawaan: folder yang sama dengan file asli)")
-    p.add_argument("-f", "--force", action="store_true", help="timpa file hasil yang sudah ada")
+    p.add_argument("files", nargs="+", type=Path, help="files to convert")
+    p.add_argument("format", help="target format, e.g. jpg, png, webp")
+    p.add_argument("-o", "--output", type=Path, help="folder for the results (default: the folder of each source file)")
+    p.add_argument("-f", "--force", action="store_true", help="overwrite results that already exist")
     p.add_argument(
-        "-p", "--paper", metavar="UKURAN", type=str.lower,
-        help=f"ukuran kertas hasil PDF: {', '.join(PAPERS)} (bawaan: a4, atau ukuran halaman DOCX; f4 = 215×330 mm)",
+        "-p", "--paper", metavar="SIZE", type=str.lower,
+        help=f"paper size of PDF results: {', '.join(PAPERS)} (default: a4, or the DOCX page size; f4 = 215×330 mm)",
     )
     p.add_argument("-V", "--version", action="version", version=f"alihrupa {__version__}")
     args = p.parse_args(argv)
@@ -89,14 +89,14 @@ def main(argv: list[str] | None = None) -> int:
     target = normalize(target_ext)
     if args.paper is not None:
         if args.paper not in PAPERS:
-            p.error(f"ukuran kertas tidak dikenal: {args.paper} (pilihan: {', '.join(PAPERS)})")
+            p.error(f"unknown paper size: {args.paper} (choices: {', '.join(PAPERS)})")
         if target != "pdf":
-            p.error("--paper hanya untuk hasil PDF")
+            p.error("--paper only applies to PDF results")
     if args.output:
         try:
             args.output.mkdir(parents=True, exist_ok=True)
         except OSError as e:
-            print(f"alihrupa: tidak bisa membuat folder {args.output} ({e})", file=sys.stderr)
+            print(f"alihrupa: cannot create folder {args.output} ({e})", file=sys.stderr)
             return 1
 
     failed: list[tuple[Path, str]] = []
@@ -111,7 +111,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if len(args.files) > 1:
         ok = len(args.files) - len(failed)
-        print(f"\nSelesai: {ok} berhasil, {len(failed)} gagal", file=sys.stderr)
+        print(f"\nDone: {ok} converted, {len(failed)} failed", file=sys.stderr)
         for src, reason in failed:
             print(f"  ✗ {src}: {reason}", file=sys.stderr)
     return 1 if failed else 0
@@ -121,7 +121,7 @@ def run() -> None:
     try:
         sys.exit(main())
     except KeyboardInterrupt:
-        print("\nDibatalkan.", file=sys.stderr)
+        print("\nCancelled.", file=sys.stderr)
         sys.exit(130)
 
 

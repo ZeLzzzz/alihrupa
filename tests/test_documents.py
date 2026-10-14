@@ -123,7 +123,7 @@ def test_remote_images_not_downloaded(tmp_path, capsys, http_server, target):
     source.write_text(f"Teks.\n\n![logo jauh]({base}/logo.png)\n\nSebaris ![ikon]({base}/i.png) di tengah.\n")
     assert main([str(source), target]) == 0
     assert requests == []
-    assert "2 gambar dari URL tidak diunduh" in capsys.readouterr().err
+    assert "did not download 2 images referenced by URL" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("target", ["docx", "pdf"])
@@ -134,7 +134,7 @@ def test_html_images_not_downloaded_and_reported(tmp_path, capsys, http_server, 
                       f'Tanpa kutip <img data-src=x src={base}/c.png alt=polos> juga.\n')
     assert main([str(source), target]) == 0
     assert requests == []
-    assert "3 gambar dari URL tidak diunduh" in capsys.readouterr().err
+    assert "did not download 3 images referenced by URL" in capsys.readouterr().err
     if target == "pdf":
         text = pdf_text(tmp_path / "html.pdf")
         assert "ikon jauh" in text and "polos" in text
@@ -146,7 +146,7 @@ def test_raw_typst_is_dropped(tmp_path, capsys, target):
     source = tmp_path / "typst.md"
     source.write_text('Awal.\n\n```{=typst}\n#text("BLOK-TYPST")\n```\n\nSebaris `#text("INLINE-TYPST")`{=typst} saja.\n')
     assert main([str(source), target]) == 0
-    assert "2 blok Typst mentah dilewati" in capsys.readouterr().err
+    assert "skipped 2 raw Typst blocks" in capsys.readouterr().err
     if target == "pdf":
         text = pdf_text(tmp_path / "typst.pdf")
         assert "Awal." in text and "TYPST" not in text
@@ -176,7 +176,7 @@ def test_docx_to_pdf(tmp_path, capsys):
     assert main([str(source), "pdf"]) == 0
     text = pdf_text(tmp_path / "surat.pdf")
     assert text.index("Dokumen Uji") < text.index("Isi utama dokumen.")
-    assert "peringatan" not in capsys.readouterr().err
+    assert "warning" not in capsys.readouterr().err
 
 
 def test_docx_dropped_parts_are_reported(tmp_path, capsys):
@@ -244,7 +244,7 @@ def test_linked_image_is_reported(tmp_path, capsys, http_server):
     )
     assert main([str(source), "pdf"]) == 0
     assert requests == []
-    assert "1 gambar yang hanya ditautkan" in capsys.readouterr().err
+    assert "left out 1 picture the DOCX only links to" in capsys.readouterr().err
     assert "Sebelum gambar." in pdf_text(tmp_path / "tautan.pdf")
 
 
@@ -258,7 +258,7 @@ def test_inserted_and_linked_image_is_not_reported(tmp_path, capsys):
                                   b'TargetMode="External"/></Relationships>'),
     )
     assert main([str(source), "pdf"]) == 0
-    assert "peringatan" not in capsys.readouterr().err
+    assert "warning" not in capsys.readouterr().err
     with pymupdf.open(tmp_path / "salinan.pdf") as doc:
         assert len(doc[0].get_images()) == 1
 
@@ -272,7 +272,7 @@ def test_empty_header_is_not_reported(tmp_path, capsys):
     )
     d.save(tmp_path / "header_kosong.docx")
     assert main([str(tmp_path / "header_kosong.docx"), "pdf"]) == 0
-    assert "tidak ikut ke PDF" not in capsys.readouterr().err
+    assert "left out of the PDF" not in capsys.readouterr().err
 
 
 def test_columns_are_reported(tmp_path, capsys):
@@ -281,7 +281,7 @@ def test_columns_are_reported(tmp_path, capsys):
     d.sections[0]._sectPr.append(parse_xml(f'<w:cols {W} w:space="720" w:num="2"/>'))
     d.save(tmp_path / "kolom.docx")
     assert main([str(tmp_path / "kolom.docx"), "pdf"]) == 0
-    assert "tata letak kolom" in capsys.readouterr().err
+    assert "column layout" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("content", [b"bukan zip", b"PK\x03\x04rusak"])

@@ -38,10 +38,10 @@ def convert(src: Path, dst: Path, fmt: str) -> None:
     try:
         with pymupdf.open(src) as doc:
             if doc.needs_pass:
-                raise ConvertError("PDF terenkripsi/berpassword, tidak bisa dibuka")
+                raise ConvertError("the PDF is encrypted or password-protected and cannot be opened")
             scanned = not any(page.get_text().strip() for page in doc)
     except (pymupdf.FileDataError, RuntimeError) as e:
-        raise ConvertError(f"PDF rusak atau tidak bisa dibaca ({e})") from None
+        raise ConvertError(f"corrupt or unreadable PDF ({e})") from None
 
     # pdf2docx skips pages it cannot parse and only logs it; collect those so nothing is dropped silently.
     collector = _ErrorCollector()
@@ -53,11 +53,11 @@ def convert(src: Path, dst: Path, fmt: str) -> None:
         finally:
             converter.close()
     except Exception as e:  # noqa: BLE001 - any library failure becomes a per-file error
-        raise ConvertError(f"gagal mengonversi PDF ({e})") from None
+        raise ConvertError(f"could not convert the PDF ({e})") from None
     finally:
         logging.getLogger().removeHandler(collector)
 
     if scanned:
-        warn(src, "PDF tidak punya lapisan teks (hasil scan?); isi DOCX berupa gambar karena OCR belum didukung")
+        warn(src, "the PDF has no text layer (scanned?); the DOCX holds images only, since OCR is not supported")
     if collector.messages:
-        warn(src, f"sebagian isi gagal dikonversi dan dilewati: {'; '.join(collector.messages)}")
+        warn(src, f"some content could not be converted and was skipped: {'; '.join(collector.messages)}")

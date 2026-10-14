@@ -54,8 +54,6 @@ The last argument is the target format. Results go next to the original file, na
 
 PDF results are A4 by default; from a DOCX they take the DOCX's page size. Choose another paper size with `-p`/`--paper`: `a4`, `a5`, `a3`, `letter` (216×279 mm), `legal` (216×356 mm) or `f4` (215×330 mm, common in Indonesia). The option only applies when the target is `pdf`; using it with another target is an error and nothing is converted. Sizes chosen with `-p` are portrait; without `-p`, a landscape DOCX stays landscape.
 
-The CLI messages are in Indonesian, because that is what the author uses.
-
 ### Exit codes and output
 
 Each successful conversion prints `source → result` on stdout. Errors and warnings go to stderr. The exit code is `0` when every file was converted and `1` otherwise, including files skipped because the result already exists or because the file is already in the target format. Invalid arguments (such as `--paper` with a target other than `pdf`) exit with `2` before anything is converted.

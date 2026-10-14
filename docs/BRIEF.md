@@ -21,6 +21,7 @@ Mengonversi file antarformat (PDF ↔ DOCX, PNG ↔ JPG, dan lainnya) biasanya d
 - DOCX → PDF mengikuti tata letak dasar DOCX: margin, huruf, spasi, perataan isi, pemenggalan, nomor halaman (D-029), serta gaya heading dan indentasi baris pertama (D-032) dan nomor halaman per section (D-034).
 - Tanpa aplikasi office: DOCX → PDF dan Markdown/TXT → PDF memakai mesin ringan yang menyusun ulang isi dokumen (D-020).
 - Instalasi yang bisa diikuti orang lain dan README.
+- Pesan terminal berbahasa Inggris (D-039).
 
 ## Di luar scope
 - Audio/video (walau `ffmpeg` tersedia).

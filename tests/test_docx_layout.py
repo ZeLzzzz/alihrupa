@@ -159,7 +159,7 @@ def test_microsoft_font_gets_metric_compatible_substitute(tmp_path, capsys):
     pdf = convert(make_docx(tmp_path / "a.docx", font="Times New Roman"))
     if "times new roman" not in FONTS:
         assert all("LiberationSerif" in l[5] for l in lines(pdf))
-    assert "tidak terpasang" not in capsys.readouterr().err
+    assert "not installed" not in capsys.readouterr().err
 
 
 # AC-3: line and paragraph spacing
@@ -235,12 +235,12 @@ def test_no_page_number_without_footer(tmp_path):
 def test_page_number_from_footer_field(tmp_path, capsys):
     pdf = convert(make_docx(tmp_path / "a.docx", margins=(2.54,) * 4, page_field=True))
     assert bottom_margin_text(pdf, 25.4) == ["1"]
-    assert "tidak ikut ke PDF" not in capsys.readouterr().err
+    assert "left out of the PDF" not in capsys.readouterr().err
 
 
 def test_footer_with_text_still_warned(tmp_path, capsys):
     convert(make_docx(tmp_path / "a.docx", footer="Rahasia perusahaan", page_field=True))
-    assert "tidak ikut ke PDF: footer" in capsys.readouterr().err
+    assert "left out of the PDF: footer" in capsys.readouterr().err
 
 
 def complex_field(instr, shown):
@@ -273,12 +273,12 @@ def test_page_number_in_other_formats_not_warned(tmp_path, capsys, field):
     """A footer holding only a roman or letter page number is still only a page number."""
     pdf = convert(add_to_footer(make_docx(tmp_path / "a.docx", margins=(2.54,) * 4), field))
     assert bottom_margin_text(pdf, 25.4) == ["1"]  # the number's own format and restarts come with REQ-012
-    assert "tidak ikut ke PDF" not in capsys.readouterr().err
+    assert "left out of the PDF" not in capsys.readouterr().err
 
 
 def test_text_beside_a_complex_page_field_still_warned(tmp_path, capsys):
     convert(add_to_footer(make_docx(tmp_path / "a.docx", footer="Halaman "), complex_page_field("arabic", "1")))
-    assert "tidak ikut ke PDF: footer" in capsys.readouterr().err
+    assert "left out of the PDF: footer" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("other", [complex_field('STYLEREF "Heading 1"', "BAB I PENDAHULUAN"),
@@ -287,14 +287,14 @@ def test_text_beside_a_complex_page_field_still_warned(tmp_path, capsys):
 def test_other_field_beside_page_number_still_warned(tmp_path, capsys, other):
     """Only the page number is rendered; a chapter title or date from another field would be lost silently."""
     convert(add_to_footer(make_docx(tmp_path / "a.docx"), [*other, f'<w:r {W}><w:tab/></w:r>', *complex_page_field("arabic", "1")]))
-    assert "tidak ikut ke PDF: footer" in capsys.readouterr().err
+    assert "left out of the PDF: footer" in capsys.readouterr().err
 
 
 # AC-6: font not installed
 def test_missing_font_warns_and_uses_default(tmp_path, capsys):
     pdf = convert(make_docx(tmp_path / "a.docx", font="Font Yang Tidak Ada"))
     err = capsys.readouterr().err
-    assert "Font Yang Tidak Ada" in err and "peringatan" in err
+    assert "Font Yang Tidak Ada" in err and "warning" in err
     assert all("Libertinus" in l[5] for l in lines(pdf))
 
 

@@ -25,7 +25,7 @@ def test_namespace_urls_are_not_reported_as_remote(tmp_path, capsys):
     source = tmp_path / "logo.svg"
     source.write_text(LOGO.replace("<svg ", '<svg xmlns:xlink="http://www.w3.org/1999/xlink" '))
     assert main([str(source), "png"]) == 0
-    assert "peringatan" not in capsys.readouterr().err
+    assert "warning" not in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("content", ["<svg", "bukan svg", ""])
@@ -33,7 +33,7 @@ def test_invalid_svg(tmp_path, capsys, content):
     source = tmp_path / "rusak.svg"
     source.write_text(content)
     assert main([str(source), "png"]) == 1
-    assert "SVG tidak valid" in capsys.readouterr().err
+    assert "invalid SVG" in capsys.readouterr().err
     assert sorted(p.name for p in tmp_path.iterdir()) == ["rusak.svg"]
 
 
@@ -46,7 +46,7 @@ def test_remote_images_are_not_downloaded(tmp_path, capsys, http_server):
     )
     assert main([str(source), "png"]) == 0  # G-001: renders without the remote image
     assert requests == []
-    assert "1 sumber dari URL tidak diunduh" in capsys.readouterr().err
+    assert "did not download 1 resource referenced by URL" in capsys.readouterr().err
 
 
 def test_relative_local_image_is_included(tmp_path):
@@ -67,4 +67,4 @@ def test_other_svg_directions_unsupported(tmp_path, capsys, name, target):
     source = tmp_path / name
     source.write_text(LOGO)
     assert main([str(source), target]) == 1
-    assert "tidak didukung" in capsys.readouterr().err
+    assert "is not supported" in capsys.readouterr().err

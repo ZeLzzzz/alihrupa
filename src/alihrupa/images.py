@@ -39,9 +39,9 @@ def convert(src: Path, dst: Path, fmt: str) -> None:
             # Bake in the EXIF rotation, since the EXIF data itself is not carried over.
             im = ImageOps.exif_transpose(opened)
     except UnidentifiedImageError:
-        raise ConvertError("bukan file gambar yang valid") from None
+        raise ConvertError("not a valid image file") from None
     except (OSError, SyntaxError, ValueError, Image.DecompressionBombError) as e:
-        raise ConvertError(f"gambar rusak atau tidak bisa dibaca ({e})") from None
+        raise ConvertError(f"corrupt or unreadable image ({e})") from None
 
     options = dict(SAVE_OPTIONS[fmt])
     if icc:
@@ -49,4 +49,4 @@ def convert(src: Path, dst: Path, fmt: str) -> None:
     try:
         prepare(im, fmt).save(dst, PIL_FORMAT[fmt], **options)
     except OSError as e:
-        raise ConvertError(f"gagal menulis hasil ({e})") from None
+        raise ConvertError(f"could not write the result ({e})") from None

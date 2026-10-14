@@ -56,7 +56,7 @@ def test_scanned_pdf_converts_with_warning(tmp_path, capsys):
     page.insert_image(page.rect, stream=png_bytes())
     doc.save(tmp_path / "scan.pdf")
     assert main([str(tmp_path / "scan.pdf"), "docx"]) == 0
-    assert "OCR belum didukung" in capsys.readouterr().err
+    assert "OCR is not supported" in capsys.readouterr().err
     assert (tmp_path / "scan.docx").is_file()
 
 
@@ -65,7 +65,7 @@ def test_encrypted_pdf(tmp_path, capsys):
     doc.new_page().insert_text((72, 72), "rahasia")
     doc.save(tmp_path / "kunci.pdf", encryption=pymupdf.PDF_ENCRYPT_AES_256, user_pw="pw", owner_pw="pw2")
     assert main([str(tmp_path / "kunci.pdf"), "docx"]) == 1
-    assert "berpassword" in capsys.readouterr().err
+    assert "password-protected" in capsys.readouterr().err
     assert sorted(p.name for p in tmp_path.iterdir()) == ["kunci.pdf"]
 
 
@@ -96,5 +96,5 @@ def test_skipped_page_is_reported(tmp_path, capsys, monkeypatch):
     doc.save(tmp_path / "dua.pdf")
     assert main([str(tmp_path / "dua.pdf"), "docx"]) == 0
     err = capsys.readouterr().err
-    assert "dilewati" in err and "halaman aneh" in err
+    assert "skipped" in err and "halaman aneh" in err
     assert "Halaman 2" in docx_text(tmp_path / "dua.docx")
